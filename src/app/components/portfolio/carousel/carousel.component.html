@@ -1,0 +1,15 @@
+<div id="carousel{{ projectTitle | lowercase | replace: ' ': '-'}}" class="carousel slide" data-bs-ride="false">
+  <div class="carousel-inner">
+    <div class="carousel-item" *ngFor="let img of images; let i = index" [class.active]="i === currentIndex">
+      <img [src]="img" class="d-block w-100" [alt]="projectTitle + ' - Imagem ' + (i + 1)">
+    </div>
+  </div>
+  <button class="carousel-control-prev" type="button" (click)="prevImage()">
+    <i class="fas fa-chevron-left"></i>
+    <span class="visually-hidden">Anterior</span>
+  </button>
+  <button class="carousel-control-next" type="button" (click)="nextImage()">
+    <i class="fas fa-chevron-right"></i>
+    <span class="visually-hidden">Próximo</span>
+  </button>
+</div>

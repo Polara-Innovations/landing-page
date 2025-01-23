@@ -1,3 +1,4 @@
+/* project.component.css */
 .card {
   margin: 20px 0;
   border: none;
@@ -9,17 +10,14 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
-.card-img-top {
-  border-radius: var(--color-radius); /* Bordas arredondadas */
-  height: 200px; /* Altura fixa para as imagens */
-  object-fit: cover; /* Cobre a área da imagem */
-}
-
 .card-body {
   background-color: var(--color-bg-secondary);
   color: var(--color-text);
-  border-radius: var(--color-radius); /* Bordas arredondadas */
-  padding: 1.5rem; /* Padding interno */
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-left-radius: var(--color-radius);
+  border-bottom-right-radius: var(--color-radius);
+  padding: 1.5rem;
 }
 
 .card-title {
@@ -32,4 +30,8 @@
 .card-text {
   font-size: var(--font-size-normal);
   color: var(--color-text);
+}
+
+.btn {
+  margin-top: 1rem;
 }

@@ -1,10 +1,9 @@
-@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap");
+/* styles.css */
 
 .hero {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: 80vh;
   animation: fadeIn 1s ease-in;
 }
 
@@ -14,47 +13,54 @@
 }
 
 .hero h1 {
-  font-size: 3.5rem;
-  color: var(--color-text);
-  margin-bottom: 1rem;
+  font-size: var(--font-size-xxlarge);
 }
 
-.hero .tagline {
-  font-size: 1.5rem;
-  color: var(--color-text);
-  margin-bottom: 1rem;
+.hero .title{
+  margin: 0;
+}
+
+.hero .subtitle {
+  margin: 0;
 }
 
 .hero-image {
+  display: flex;
+  justify-content: center;
   flex: 1;
 }
 
 .hero-image img {
   width: 100%;
-  max-width: 500px;
+  max-width: 30vw;
+  transition: transform 0.3s ease;
 }
 
-.vision-mission {
+.hero-image img:hover {
+  transform: scale(1.05);
+}
+
+.vision-mission-grid {
   display: flex; 
   justify-content: space-between; 
   gap: 2rem; 
-  margin: 4rem 0;
   flex-wrap: wrap;
 }
 
 .vision-card, .mission-card {
-  flex: 1 1 calc(50% - 2rem); /* Define largura de 50% menos o espaço do gap */
+  flex: 1 1 calc(50% - 2rem); 
   max-width: calc(50% - 2rem); 
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
   padding: 2rem;
   border-radius: 10px;
-  transition: transform 0.3s ease;
-  background: var(--color-bg-secondary); /* Fundo ajustado para o secundário */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background: var(--color-bg-secondary);
   color: var(--color-text);
 }
 
 .vision-card:hover, .mission-card:hover {
   transform: translateY(-5px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2); 
 }
 
 @media (max-width: 768px) {
@@ -82,14 +88,21 @@
 .value-card {
   padding: 2rem;
   border-radius: 10px;
-  background: var(--color-bg-secondary); /* Fundo ajustado */
+  background: var(--color-bg-secondary);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .value-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1rem; 
 }
 
 @keyframes fadeIn {
@@ -117,14 +130,14 @@
   }
 
   .hero h1 {
-    font-size: 2.5rem;
+    font-size: var(--font-size-xlarge);
   }
 }
 
 @media print {
   body {
-    background-color: white; /* Fundo branco para impressão */
-    color: black; /* Texto preto para impressão */
+    background-color: white; 
+    color: black; 
   }
 
   .about-container {

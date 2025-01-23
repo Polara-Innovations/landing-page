@@ -1,30 +1,28 @@
-<nav class="navbar navbar-expand-lg">
+<nav class="navbar navbar-expand-lg" #navbar>
   <a class="navbar-brand" href="#">
     <img src="assets/images/logo-polara.svg" alt="Polara Innovations Logo" width="30" height="30">
     Polara Innovations
   </a>
-  <!-- Botão de alternância (hamburger) -->
   <button class="navbar-toggler" type="button" (click)="toggleNavbar()"
     aria-controls="navbarNav" aria-expanded="false" id="navbarToggleBtn">
     <i class="fas fa-bars"></i> 
   </button>
-  <!-- Menu de navegação -->
   <div class="navbar-collapse" [ngClass]="{'show': isNavbarOpen}" id="navbarNav">
     <ul class="navbar-nav ms-auto">
-      <li class="nav-item" (click)="onNavClick('home')">
-        <a class="nav-link" href="#home" [class.active]="activeNav === 'home'">Início</a>
+      <li class="nav-item">
+        <a class="nav-link" (click)="scrollTo('home')" [class.active]="activeNav === 'home'">Início</a>
       </li>
-      <li class="nav-item" (click)="onNavClick('about')">
-        <a class="nav-link" href="#about" [class.active]="activeNav === 'about'">Quem Somos</a>
+      <li class="nav-item">
+        <a class="nav-link" (click)="scrollTo('about')" [class.active]="activeNav === 'about'">Quem Somos</a>
       </li>
-      <li class="nav-item" (click)="onNavClick('services')">
-        <a class="nav-link" href="#services" [class.active]="activeNav === 'services'">Serviços</a>
+      <li class="nav-item">
+        <a class="nav-link" (click)="scrollTo('services')" [class.active]="activeNav === 'services'">Serviços</a>
       </li>
-      <li class="nav-item" (click)="onNavClick('portfolio')">
-        <a class="nav-link" href="#portfolio" [class.active]="activeNav === 'portfolio'">Portfólio</a>
+      <li class="nav-item">
+        <a class="nav-link" (click)="scrollTo('portfolio')" [class.active]="activeNav === 'portfolio'">Portfólio</a>
       </li>
-      <li class="nav-item" (click)="onNavClick('contact')">
-        <a class="nav-link" href="#contact" [class.active]="activeNav === 'contact'">Contato</a>
+      <li class="nav-item">
+        <a class="nav-link" (click)="scrollTo('contact')" [class.active]="activeNav === 'contact'">Contato</a>
       </li>
       <li class="nav-item">
         <button (click)="themeService.toggleTheme()" class="btn theme-toggle">

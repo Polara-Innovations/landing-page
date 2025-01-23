@@ -1,0 +1,150 @@
+:root {
+    --font-size-small: 0.875rem;   /* 14px */
+    --font-size-normal: 1rem;      /* 16px */
+    --font-size-large: 1.5rem;     /* 24px */
+    --font-size-xlarge: 2rem;      /* 32px */
+    --font-size-xxlarge: 2.5rem;   /* 40px */
+
+    --line-height-small: 1.2;      /* 20px */
+    --line-height-normal: 1.5;     /* 24px */
+    --line-height-large: 1.6;      /* 28px */
+    
+    --font-weight-normal: 400;
+    --font-weight-bold: 600;        /* Peso mais leve para títulos */
+    --font-weight-extrabold: 700;   /* Peso extra para títulos principais */
+}
+
+/* Títulos */
+.title {
+    font-size: var(--font-size-xxlarge); /* Maior título */
+    font-weight: var(--font-weight-extrabold);
+    color: var(--color-heading);
+    margin: 1.5rem 0; /* Espaçamento vertical */
+}
+
+.title-small {
+    font-size: var(--font-size-xlarge); /* Título secundário */
+    font-weight: var(--font-weight-bold);
+    color: var(--color-heading);
+    margin: 1.5rem 0; /* Espaçamento vertical */
+}
+
+.subtitle {
+    font-size: var(--font-size-large); /* Subtítulo */
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-muted);
+    margin: 0.5rem 0; /* Espaçamento vertical */
+}
+
+/* Texto Normal */
+.text-normal {
+    font-size: var(--font-size-normal);
+    font-weight: var(--font-weight-normal);
+    color: var(--color-text);
+    line-height: var(--line-height-normal);
+    margin: 0.5rem 0; /* Margem entre parágrafos */
+}
+
+.text-muted {
+    font-size: var(--font-size-normal);
+    font-weight: var(--font-weight-normal);
+    color: var(--color-text-muted);
+    line-height: var(--line-height-normal);
+    margin: 0.5rem 0; /* Margem entre parágrafos */
+}
+
+/* Tamanho Pequeno */
+.text-small {
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-normal);
+    color: var(--color-text);
+    line-height: var(--line-height-small);
+    margin: 0.5rem 0; /* Margem entre parágrafos */
+}
+
+/* Tamanho Grande */
+.text-large {
+    font-size: var(--font-size-large);
+    font-weight: var(--font-weight-normal);
+    color: var(--color-text);
+    line-height: var(--line-height-large);
+    margin: 0.5rem 0; /* Margem entre parágrafos */
+}
+
+/* Títulos de Seções */
+.section-title {
+    font-size: var(--font-size-large);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-heading);
+    margin: 2rem 0 1rem; /* Margem superior e inferior */
+}
+
+/* Links */
+.link {
+    font-size: var(--font-size-normal);
+    color: var(--color-link);
+    text-decoration: none;
+    transition: color var(--transition-speed);
+}
+
+.link:hover {
+    color: var(--color-link-hover);
+}
+
+/* Botões */
+.button {
+    font-size: var(--font-size-normal);
+    font-weight: var(--font-weight-bold);
+    background-color: var(--color-button-bg);
+    color: var(--color-button-text);
+    padding: 0.5rem 1rem; /* Padding do botão */
+    border: none;
+    border-radius: var(--color-radius);
+    cursor: pointer;
+    transition: background-color var(--transition-speed);
+}
+
+.button:hover {
+    background-color: var(--color-button-hover);
+}
+
+/* Exemplo de classes para mensagens de status */
+.success-message {
+    font-size: var(--font-size-normal);
+    background-color: var(--color-success-bg);
+    color: var(--color-success);
+    padding: 1rem;
+    border-radius: var(--color-radius);
+    margin: 1rem 0; /* Margem entre mensagens */
+}
+
+.error-message {
+    font-size: var(--font-size-normal);
+    background-color: var(--color-error-bg);
+    color: var(--color-error);
+    padding: 1rem;
+    border-radius: var(--color-radius);
+    margin: 1rem 0; /* Margem entre mensagens */
+}
+
+.warning-message {
+    font-size: var(--font-size-normal);
+    background-color: var(--color-warning-bg);
+    color: var(--color-warning);
+    padding: 1rem;
+    border-radius: var(--color-radius);
+    margin: 1rem 0; /* Margem entre mensagens */
+}
+
+/* Classes para texto destacado */
+.text-highlight {
+    font-size: var(--font-size-xlarge);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-link);
+}
+
+.text-small-light {
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-normal);
+    color: var(--color-text-muted);
+}
