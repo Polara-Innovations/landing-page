@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/components/services/services.component.css"],
+  "sourcesContent": [".card {\n  margin: 20px 0;\n  border: none;\n  transition: transform var(--transition-speed), box-shadow var(--transition-speed);\n}\n\n.card:hover {\n  transform: translateY(-5px);\n  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);\n}\n\n.card-img-top {\n  border-radius: var(--color-radius); /* Bordas arredondadas */\n  height: 200px; /* Altura fixa para as imagens */\n  object-fit: cover; /* Cobre a \u00E1rea da imagem */\n}\n\n.card-body {\n  background-color: var(--color-bg-secondary);\n  color: var(--color-text);\n  border-radius: var(--color-radius); /* Bordas arredondadas */\n  padding: 1.5rem; /* Padding interno */\n}\n\n.card-title {\n  font-size: var(--font-size-large);\n  font-weight: var(--font-weight-bold);\n  color: var(--color-heading);\n  margin-bottom: 0.5rem;\n}\n\n.card-text {\n  font-size: var(--font-size-normal);\n  color: var(--color-text);\n}"],
+  "mappings": ";AAAA,CAAC;AACC,UAAQ,KAAK;AACb,UAAQ;AACR,cAAY,UAAU,IAAI,mBAAmB,EAAE,WAAW,IAAI;AAChE;AAEA,CANC,IAMI;AACH,aAAW,WAAW;AACtB,cAAY,EAAE,IAAI,KAAK,KAAK,CAAC,EAAE,CAAC,EAAE,CAAC,EAAE;AACvC;AAEA,CAAC;AACC,iBAAe,IAAI;AACnB,UAAQ;AACR,cAAY;AACd;AAEA,CAAC;AACC,oBAAkB,IAAI;AACtB,SAAO,IAAI;AACX,iBAAe,IAAI;AACnB,WAAS;AACX;AAEA,CAAC;AACC,aAAW,IAAI;AACf,eAAa,IAAI;AACjB,SAAO,IAAI;AACX,iBAAe;AACjB;AAEA,CAAC;AACC,aAAW,IAAI;AACf,SAAO,IAAI;AACb;",
+  "names": []
+}

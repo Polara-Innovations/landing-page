@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/components/shared/card/card.component.css"],
-  "sourcesContent": [".card {\r\n    margin: 20px 0;\r\n    border: none;\r\n  }\r\n  \r\n  .card-title {\r\n    color: var(--color-heading);\r\n  }\r\n  \r\n  .card-body {\r\n    background-color: var(--color-bg-secondary);\r\n  }\r\n  \r\n  .bg-dark .card-body {\r\n    background-color: var(--color-bg);\r\n    color: var(--color-text-muted);\r\n  }\r\n  \r\n  .bg-light .card-body {\r\n    background-color: var(--color-bg-muted);\r\n    color: var(--color-text);\r\n  }"],
-  "mappings": ";AAAA,CAAC;AACG,UAAQ,KAAK;AACb,UAAQ;AACV;AAEA,CAAC;AACC,SAAO,IAAI;AACb;AAEA,CAAC;AACC,oBAAkB,IAAI;AACxB;AAEA,CAAC,QAAQ,CAJR;AAKC,oBAAkB,IAAI;AACtB,SAAO,IAAI;AACb;AAEA,CAAC,SAAS,CATT;AAUC,oBAAkB,IAAI;AACtB,SAAO,IAAI;AACb;",
-  "names": []
-}

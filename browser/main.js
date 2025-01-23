@@ -271,15 +271,18 @@ var COMPUTED_NODE = /* @__PURE__ */ (() => {
       node.value = COMPUTING;
       const prevConsumer = consumerBeforeComputation(node);
       let newValue;
+      let wasEqual = false;
       try {
         newValue = node.computation();
+        setActiveConsumer(null);
+        wasEqual = oldValue !== UNSET && oldValue !== ERRORED && newValue !== ERRORED && node.equal(oldValue, newValue);
       } catch (err) {
         newValue = ERRORED;
         node.error = err;
       } finally {
         consumerAfterComputation(node, prevConsumer);
       }
-      if (oldValue !== UNSET && oldValue !== ERRORED && newValue !== ERRORED && node.equal(oldValue, newValue)) {
+      if (wasEqual) {
         node.value = oldValue;
         return;
       }
@@ -8273,605 +8276,6 @@ var InputFlags;
   InputFlags2[InputFlags2["SignalBased"] = 1] = "SignalBased";
   InputFlags2[InputFlags2["HasDecoratorInputTransform"] = 2] = "HasDecoratorInputTransform";
 })(InputFlags || (InputFlags = {}));
-var RendererStyleFlags2;
-(function(RendererStyleFlags22) {
-  RendererStyleFlags22[RendererStyleFlags22["Important"] = 1] = "Important";
-  RendererStyleFlags22[RendererStyleFlags22["DashCase"] = 2] = "DashCase";
-})(RendererStyleFlags2 || (RendererStyleFlags2 = {}));
-var _icuContainerIterate;
-function icuContainerIterate(tIcuContainerNode, lView) {
-  return _icuContainerIterate(tIcuContainerNode, lView);
-}
-function ensureIcuContainerVisitorLoaded(loader) {
-  if (_icuContainerIterate === void 0) {
-    _icuContainerIterate = loader();
-  }
-}
-function applyToElementOrContainer(action, renderer, parent, lNodeToHandle, beforeNode) {
-  if (lNodeToHandle != null) {
-    let lContainer;
-    let isComponent2 = false;
-    if (isLContainer(lNodeToHandle)) {
-      lContainer = lNodeToHandle;
-    } else if (isLView(lNodeToHandle)) {
-      isComponent2 = true;
-      ngDevMode && assertDefined(lNodeToHandle[HOST], "HOST must be defined for a component LView");
-      lNodeToHandle = lNodeToHandle[HOST];
-    }
-    const rNode = unwrapRNode(lNodeToHandle);
-    if (action === 0 && parent !== null) {
-      if (beforeNode == null) {
-        nativeAppendChild(renderer, parent, rNode);
-      } else {
-        nativeInsertBefore(renderer, parent, rNode, beforeNode || null, true);
-      }
-    } else if (action === 1 && parent !== null) {
-      nativeInsertBefore(renderer, parent, rNode, beforeNode || null, true);
-    } else if (action === 2) {
-      nativeRemoveNode(renderer, rNode, isComponent2);
-    } else if (action === 3) {
-      ngDevMode && ngDevMode.rendererDestroyNode++;
-      renderer.destroyNode(rNode);
-    }
-    if (lContainer != null) {
-      applyContainer(renderer, action, lContainer, parent, beforeNode);
-    }
-  }
-}
-function createTextNode(renderer, value) {
-  ngDevMode && ngDevMode.rendererCreateTextNode++;
-  ngDevMode && ngDevMode.rendererSetText++;
-  return renderer.createText(value);
-}
-function updateTextNode(renderer, rNode, value) {
-  ngDevMode && ngDevMode.rendererSetText++;
-  renderer.setValue(rNode, value);
-}
-function createCommentNode(renderer, value) {
-  ngDevMode && ngDevMode.rendererCreateComment++;
-  return renderer.createComment(escapeCommentText(value));
-}
-function createElementNode(renderer, name, namespace) {
-  ngDevMode && ngDevMode.rendererCreateElement++;
-  return renderer.createElement(name, namespace);
-}
-function removeViewFromDOM(tView, lView) {
-  detachViewFromDOM(tView, lView);
-  lView[HOST] = null;
-  lView[T_HOST] = null;
-}
-function addViewToDOM(tView, parentTNode, renderer, lView, parentNativeNode, beforeNode) {
-  lView[HOST] = parentNativeNode;
-  lView[T_HOST] = parentTNode;
-  applyView(tView, lView, renderer, 1, parentNativeNode, beforeNode);
-}
-function detachViewFromDOM(tView, lView) {
-  lView[ENVIRONMENT].changeDetectionScheduler?.notify(
-    10
-    /* NotificationSource.ViewDetachedFromDOM */
-  );
-  applyView(tView, lView, lView[RENDERER], 2, null, null);
-}
-function destroyViewTree(rootView) {
-  let lViewOrLContainer = rootView[CHILD_HEAD];
-  if (!lViewOrLContainer) {
-    return cleanUpView(rootView[TVIEW], rootView);
-  }
-  while (lViewOrLContainer) {
-    let next = null;
-    if (isLView(lViewOrLContainer)) {
-      next = lViewOrLContainer[CHILD_HEAD];
-    } else {
-      ngDevMode && assertLContainer(lViewOrLContainer);
-      const firstView = lViewOrLContainer[CONTAINER_HEADER_OFFSET];
-      if (firstView) next = firstView;
-    }
-    if (!next) {
-      while (lViewOrLContainer && !lViewOrLContainer[NEXT] && lViewOrLContainer !== rootView) {
-        if (isLView(lViewOrLContainer)) {
-          cleanUpView(lViewOrLContainer[TVIEW], lViewOrLContainer);
-        }
-        lViewOrLContainer = lViewOrLContainer[PARENT];
-      }
-      if (lViewOrLContainer === null) lViewOrLContainer = rootView;
-      if (isLView(lViewOrLContainer)) {
-        cleanUpView(lViewOrLContainer[TVIEW], lViewOrLContainer);
-      }
-      next = lViewOrLContainer && lViewOrLContainer[NEXT];
-    }
-    lViewOrLContainer = next;
-  }
-}
-function insertView(tView, lView, lContainer, index) {
-  ngDevMode && assertLView(lView);
-  ngDevMode && assertLContainer(lContainer);
-  const indexInContainer = CONTAINER_HEADER_OFFSET + index;
-  const containerLength = lContainer.length;
-  if (index > 0) {
-    lContainer[indexInContainer - 1][NEXT] = lView;
-  }
-  if (index < containerLength - CONTAINER_HEADER_OFFSET) {
-    lView[NEXT] = lContainer[indexInContainer];
-    addToArray(lContainer, CONTAINER_HEADER_OFFSET + index, lView);
-  } else {
-    lContainer.push(lView);
-    lView[NEXT] = null;
-  }
-  lView[PARENT] = lContainer;
-  const declarationLContainer = lView[DECLARATION_LCONTAINER];
-  if (declarationLContainer !== null && lContainer !== declarationLContainer) {
-    trackMovedView(declarationLContainer, lView);
-  }
-  const lQueries = lView[QUERIES];
-  if (lQueries !== null) {
-    lQueries.insertView(tView);
-  }
-  updateAncestorTraversalFlagsOnAttach(lView);
-  lView[FLAGS] |= 128;
-}
-function trackMovedView(declarationContainer, lView) {
-  ngDevMode && assertDefined(lView, "LView required");
-  ngDevMode && assertLContainer(declarationContainer);
-  const movedViews = declarationContainer[MOVED_VIEWS];
-  const parent = lView[PARENT];
-  ngDevMode && assertDefined(parent, "missing parent");
-  if (isLView(parent)) {
-    declarationContainer[FLAGS] |= 2;
-  } else {
-    const insertedComponentLView = parent[PARENT][DECLARATION_COMPONENT_VIEW];
-    ngDevMode && assertDefined(insertedComponentLView, "Missing insertedComponentLView");
-    const declaredComponentLView = lView[DECLARATION_COMPONENT_VIEW];
-    ngDevMode && assertDefined(declaredComponentLView, "Missing declaredComponentLView");
-    if (declaredComponentLView !== insertedComponentLView) {
-      declarationContainer[FLAGS] |= 2;
-    }
-  }
-  if (movedViews === null) {
-    declarationContainer[MOVED_VIEWS] = [lView];
-  } else {
-    movedViews.push(lView);
-  }
-}
-function detachMovedView(declarationContainer, lView) {
-  ngDevMode && assertLContainer(declarationContainer);
-  ngDevMode && assertDefined(declarationContainer[MOVED_VIEWS], "A projected view should belong to a non-empty projected views collection");
-  const movedViews = declarationContainer[MOVED_VIEWS];
-  const declarationViewIndex = movedViews.indexOf(lView);
-  movedViews.splice(declarationViewIndex, 1);
-}
-function detachView(lContainer, removeIndex) {
-  if (lContainer.length <= CONTAINER_HEADER_OFFSET) return;
-  const indexInContainer = CONTAINER_HEADER_OFFSET + removeIndex;
-  const viewToDetach = lContainer[indexInContainer];
-  if (viewToDetach) {
-    const declarationLContainer = viewToDetach[DECLARATION_LCONTAINER];
-    if (declarationLContainer !== null && declarationLContainer !== lContainer) {
-      detachMovedView(declarationLContainer, viewToDetach);
-    }
-    if (removeIndex > 0) {
-      lContainer[indexInContainer - 1][NEXT] = viewToDetach[NEXT];
-    }
-    const removedLView = removeFromArray(lContainer, CONTAINER_HEADER_OFFSET + removeIndex);
-    removeViewFromDOM(viewToDetach[TVIEW], viewToDetach);
-    const lQueries = removedLView[QUERIES];
-    if (lQueries !== null) {
-      lQueries.detachView(removedLView[TVIEW]);
-    }
-    viewToDetach[PARENT] = null;
-    viewToDetach[NEXT] = null;
-    viewToDetach[FLAGS] &= ~128;
-  }
-  return viewToDetach;
-}
-function destroyLView(tView, lView) {
-  if (isDestroyed(lView)) {
-    return;
-  }
-  const renderer = lView[RENDERER];
-  if (renderer.destroyNode) {
-    applyView(tView, lView, renderer, 3, null, null);
-  }
-  destroyViewTree(lView);
-}
-function cleanUpView(tView, lView) {
-  if (isDestroyed(lView)) {
-    return;
-  }
-  const prevConsumer = setActiveConsumer(null);
-  try {
-    lView[FLAGS] &= ~128;
-    lView[FLAGS] |= 256;
-    lView[REACTIVE_TEMPLATE_CONSUMER] && consumerDestroy(lView[REACTIVE_TEMPLATE_CONSUMER]);
-    executeOnDestroys(tView, lView);
-    processCleanups(tView, lView);
-    if (lView[TVIEW].type === 1) {
-      ngDevMode && ngDevMode.rendererDestroy++;
-      lView[RENDERER].destroy();
-    }
-    const declarationContainer = lView[DECLARATION_LCONTAINER];
-    if (declarationContainer !== null && isLContainer(lView[PARENT])) {
-      if (declarationContainer !== lView[PARENT]) {
-        detachMovedView(declarationContainer, lView);
-      }
-      const lQueries = lView[QUERIES];
-      if (lQueries !== null) {
-        lQueries.detachView(tView);
-      }
-    }
-    unregisterLView(lView);
-  } finally {
-    setActiveConsumer(prevConsumer);
-  }
-}
-function processCleanups(tView, lView) {
-  ngDevMode && assertNotReactive(processCleanups.name);
-  const tCleanup = tView.cleanup;
-  const lCleanup = lView[CLEANUP];
-  if (tCleanup !== null) {
-    for (let i = 0; i < tCleanup.length - 1; i += 2) {
-      if (typeof tCleanup[i] === "string") {
-        const targetIdx = tCleanup[i + 3];
-        ngDevMode && assertNumber(targetIdx, "cleanup target must be a number");
-        if (targetIdx >= 0) {
-          lCleanup[targetIdx]();
-        } else {
-          lCleanup[-targetIdx].unsubscribe();
-        }
-        i += 2;
-      } else {
-        const context2 = lCleanup[tCleanup[i + 1]];
-        tCleanup[i].call(context2);
-      }
-    }
-  }
-  if (lCleanup !== null) {
-    lView[CLEANUP] = null;
-  }
-  const destroyHooks = lView[ON_DESTROY_HOOKS];
-  if (destroyHooks !== null) {
-    lView[ON_DESTROY_HOOKS] = null;
-    for (let i = 0; i < destroyHooks.length; i++) {
-      const destroyHooksFn = destroyHooks[i];
-      ngDevMode && assertFunction(destroyHooksFn, "Expecting destroy hook to be a function.");
-      destroyHooksFn();
-    }
-  }
-  const effects = lView[EFFECTS];
-  if (effects !== null) {
-    lView[EFFECTS] = null;
-    for (const effect of effects) {
-      effect.destroy();
-    }
-  }
-}
-function executeOnDestroys(tView, lView) {
-  ngDevMode && assertNotReactive(executeOnDestroys.name);
-  let destroyHooks;
-  if (tView != null && (destroyHooks = tView.destroyHooks) != null) {
-    for (let i = 0; i < destroyHooks.length; i += 2) {
-      const context2 = lView[destroyHooks[i]];
-      if (!(context2 instanceof NodeInjectorFactory)) {
-        const toCall = destroyHooks[i + 1];
-        if (Array.isArray(toCall)) {
-          for (let j = 0; j < toCall.length; j += 2) {
-            const callContext = context2[toCall[j]];
-            const hook = toCall[j + 1];
-            profiler(4, callContext, hook);
-            try {
-              hook.call(callContext);
-            } finally {
-              profiler(5, callContext, hook);
-            }
-          }
-        } else {
-          profiler(4, context2, toCall);
-          try {
-            toCall.call(context2);
-          } finally {
-            profiler(5, context2, toCall);
-          }
-        }
-      }
-    }
-  }
-}
-function getParentRElement(tView, tNode, lView) {
-  return getClosestRElement(tView, tNode.parent, lView);
-}
-function getClosestRElement(tView, tNode, lView) {
-  let parentTNode = tNode;
-  while (parentTNode !== null && parentTNode.type & (8 | 32 | 128)) {
-    tNode = parentTNode;
-    parentTNode = tNode.parent;
-  }
-  if (parentTNode === null) {
-    return lView[HOST];
-  } else {
-    ngDevMode && assertTNodeType(
-      parentTNode,
-      3 | 4
-      /* TNodeType.Container */
-    );
-    const {
-      componentOffset
-    } = parentTNode;
-    if (componentOffset > -1) {
-      ngDevMode && assertTNodeForLView(parentTNode, lView);
-      const {
-        encapsulation
-      } = tView.data[parentTNode.directiveStart + componentOffset];
-      if (encapsulation === ViewEncapsulation.None || encapsulation === ViewEncapsulation.Emulated) {
-        return null;
-      }
-    }
-    return getNativeByTNode(parentTNode, lView);
-  }
-}
-function nativeInsertBefore(renderer, parent, child, beforeNode, isMove) {
-  ngDevMode && ngDevMode.rendererInsertBefore++;
-  renderer.insertBefore(parent, child, beforeNode, isMove);
-}
-function nativeAppendChild(renderer, parent, child) {
-  ngDevMode && ngDevMode.rendererAppendChild++;
-  ngDevMode && assertDefined(parent, "parent node must be defined");
-  renderer.appendChild(parent, child);
-}
-function nativeAppendOrInsertBefore(renderer, parent, child, beforeNode, isMove) {
-  if (beforeNode !== null) {
-    nativeInsertBefore(renderer, parent, child, beforeNode, isMove);
-  } else {
-    nativeAppendChild(renderer, parent, child);
-  }
-}
-function nativeParentNode(renderer, node) {
-  return renderer.parentNode(node);
-}
-function nativeNextSibling(renderer, node) {
-  return renderer.nextSibling(node);
-}
-function getInsertInFrontOfRNode(parentTNode, currentTNode, lView) {
-  return _getInsertInFrontOfRNodeWithI18n(parentTNode, currentTNode, lView);
-}
-function getInsertInFrontOfRNodeWithNoI18n(parentTNode, currentTNode, lView) {
-  if (parentTNode.type & (8 | 32)) {
-    return getNativeByTNode(parentTNode, lView);
-  }
-  return null;
-}
-var _getInsertInFrontOfRNodeWithI18n = getInsertInFrontOfRNodeWithNoI18n;
-var _processI18nInsertBefore;
-function setI18nHandling(getInsertInFrontOfRNodeWithI18n2, processI18nInsertBefore2) {
-  _getInsertInFrontOfRNodeWithI18n = getInsertInFrontOfRNodeWithI18n2;
-  _processI18nInsertBefore = processI18nInsertBefore2;
-}
-function appendChild(tView, lView, childRNode, childTNode) {
-  const parentRNode = getParentRElement(tView, childTNode, lView);
-  const renderer = lView[RENDERER];
-  const parentTNode = childTNode.parent || lView[T_HOST];
-  const anchorNode = getInsertInFrontOfRNode(parentTNode, childTNode, lView);
-  if (parentRNode != null) {
-    if (Array.isArray(childRNode)) {
-      for (let i = 0; i < childRNode.length; i++) {
-        nativeAppendOrInsertBefore(renderer, parentRNode, childRNode[i], anchorNode, false);
-      }
-    } else {
-      nativeAppendOrInsertBefore(renderer, parentRNode, childRNode, anchorNode, false);
-    }
-  }
-  _processI18nInsertBefore !== void 0 && _processI18nInsertBefore(renderer, childTNode, lView, childRNode, parentRNode);
-}
-function getFirstNativeNode(lView, tNode) {
-  if (tNode !== null) {
-    ngDevMode && assertTNodeType(
-      tNode,
-      3 | 12 | 32 | 16 | 128
-      /* TNodeType.LetDeclaration */
-    );
-    const tNodeType = tNode.type;
-    if (tNodeType & 3) {
-      return getNativeByTNode(tNode, lView);
-    } else if (tNodeType & 4) {
-      return getBeforeNodeForView(-1, lView[tNode.index]);
-    } else if (tNodeType & 8) {
-      const elIcuContainerChild = tNode.child;
-      if (elIcuContainerChild !== null) {
-        return getFirstNativeNode(lView, elIcuContainerChild);
-      } else {
-        const rNodeOrLContainer = lView[tNode.index];
-        if (isLContainer(rNodeOrLContainer)) {
-          return getBeforeNodeForView(-1, rNodeOrLContainer);
-        } else {
-          return unwrapRNode(rNodeOrLContainer);
-        }
-      }
-    } else if (tNodeType & 128) {
-      return getFirstNativeNode(lView, tNode.next);
-    } else if (tNodeType & 32) {
-      let nextRNode = icuContainerIterate(tNode, lView);
-      let rNode = nextRNode();
-      return rNode || unwrapRNode(lView[tNode.index]);
-    } else {
-      const projectionNodes = getProjectionNodes(lView, tNode);
-      if (projectionNodes !== null) {
-        if (Array.isArray(projectionNodes)) {
-          return projectionNodes[0];
-        }
-        const parentView = getLViewParent(lView[DECLARATION_COMPONENT_VIEW]);
-        ngDevMode && assertParentView(parentView);
-        return getFirstNativeNode(parentView, projectionNodes);
-      } else {
-        return getFirstNativeNode(lView, tNode.next);
-      }
-    }
-  }
-  return null;
-}
-function getProjectionNodes(lView, tNode) {
-  if (tNode !== null) {
-    const componentView = lView[DECLARATION_COMPONENT_VIEW];
-    const componentHost = componentView[T_HOST];
-    const slotIdx = tNode.projection;
-    ngDevMode && assertProjectionSlots(lView);
-    return componentHost.projection[slotIdx];
-  }
-  return null;
-}
-function getBeforeNodeForView(viewIndexInContainer, lContainer) {
-  const nextViewIndex = CONTAINER_HEADER_OFFSET + viewIndexInContainer + 1;
-  if (nextViewIndex < lContainer.length) {
-    const lView = lContainer[nextViewIndex];
-    const firstTNodeOfView = lView[TVIEW].firstChild;
-    if (firstTNodeOfView !== null) {
-      return getFirstNativeNode(lView, firstTNodeOfView);
-    }
-  }
-  return lContainer[NATIVE];
-}
-function nativeRemoveNode(renderer, rNode, isHostElement) {
-  ngDevMode && ngDevMode.rendererRemoveNode++;
-  renderer.removeChild(null, rNode, isHostElement);
-}
-function applyNodes(renderer, action, tNode, lView, parentRElement, beforeNode, isProjection) {
-  while (tNode != null) {
-    ngDevMode && assertTNodeForLView(tNode, lView);
-    if (tNode.type === 128) {
-      tNode = tNode.next;
-      continue;
-    }
-    ngDevMode && assertTNodeType(
-      tNode,
-      3 | 12 | 16 | 32
-      /* TNodeType.Icu */
-    );
-    const rawSlotValue = lView[tNode.index];
-    const tNodeType = tNode.type;
-    if (isProjection) {
-      if (action === 0) {
-        rawSlotValue && attachPatchData(unwrapRNode(rawSlotValue), lView);
-        tNode.flags |= 2;
-      }
-    }
-    if ((tNode.flags & 32) !== 32) {
-      if (tNodeType & 8) {
-        applyNodes(renderer, action, tNode.child, lView, parentRElement, beforeNode, false);
-        applyToElementOrContainer(action, renderer, parentRElement, rawSlotValue, beforeNode);
-      } else if (tNodeType & 32) {
-        const nextRNode = icuContainerIterate(tNode, lView);
-        let rNode;
-        while (rNode = nextRNode()) {
-          applyToElementOrContainer(action, renderer, parentRElement, rNode, beforeNode);
-        }
-        applyToElementOrContainer(action, renderer, parentRElement, rawSlotValue, beforeNode);
-      } else if (tNodeType & 16) {
-        applyProjectionRecursive(renderer, action, lView, tNode, parentRElement, beforeNode);
-      } else {
-        ngDevMode && assertTNodeType(
-          tNode,
-          3 | 4
-          /* TNodeType.Container */
-        );
-        applyToElementOrContainer(action, renderer, parentRElement, rawSlotValue, beforeNode);
-      }
-    }
-    tNode = isProjection ? tNode.projectionNext : tNode.next;
-  }
-}
-function applyView(tView, lView, renderer, action, parentRElement, beforeNode) {
-  applyNodes(renderer, action, tView.firstChild, lView, parentRElement, beforeNode, false);
-}
-function applyProjection(tView, lView, tProjectionNode) {
-  const renderer = lView[RENDERER];
-  const parentRNode = getParentRElement(tView, tProjectionNode, lView);
-  const parentTNode = tProjectionNode.parent || lView[T_HOST];
-  let beforeNode = getInsertInFrontOfRNode(parentTNode, tProjectionNode, lView);
-  applyProjectionRecursive(renderer, 0, lView, tProjectionNode, parentRNode, beforeNode);
-}
-function applyProjectionRecursive(renderer, action, lView, tProjectionNode, parentRElement, beforeNode) {
-  const componentLView = lView[DECLARATION_COMPONENT_VIEW];
-  const componentNode = componentLView[T_HOST];
-  ngDevMode && assertEqual(typeof tProjectionNode.projection, "number", "expecting projection index");
-  const nodeToProjectOrRNodes = componentNode.projection[tProjectionNode.projection];
-  if (Array.isArray(nodeToProjectOrRNodes)) {
-    for (let i = 0; i < nodeToProjectOrRNodes.length; i++) {
-      const rNode = nodeToProjectOrRNodes[i];
-      applyToElementOrContainer(action, renderer, parentRElement, rNode, beforeNode);
-    }
-  } else {
-    let nodeToProject = nodeToProjectOrRNodes;
-    const projectedComponentLView = componentLView[PARENT];
-    if (hasInSkipHydrationBlockFlag(tProjectionNode)) {
-      nodeToProject.flags |= 128;
-    }
-    applyNodes(renderer, action, nodeToProject, projectedComponentLView, parentRElement, beforeNode, true);
-  }
-}
-function applyContainer(renderer, action, lContainer, parentRElement, beforeNode) {
-  ngDevMode && assertLContainer(lContainer);
-  const anchor = lContainer[NATIVE];
-  const native = unwrapRNode(lContainer);
-  if (anchor !== native) {
-    applyToElementOrContainer(action, renderer, parentRElement, anchor, beforeNode);
-  }
-  for (let i = CONTAINER_HEADER_OFFSET; i < lContainer.length; i++) {
-    const lView = lContainer[i];
-    applyView(lView[TVIEW], lView, renderer, action, parentRElement, anchor);
-  }
-}
-function applyStyling(renderer, isClassBased, rNode, prop, value) {
-  if (isClassBased) {
-    if (!value) {
-      ngDevMode && ngDevMode.rendererRemoveClass++;
-      renderer.removeClass(rNode, prop);
-    } else {
-      ngDevMode && ngDevMode.rendererAddClass++;
-      renderer.addClass(rNode, prop);
-    }
-  } else {
-    let flags = prop.indexOf("-") === -1 ? void 0 : RendererStyleFlags2.DashCase;
-    if (value == null) {
-      ngDevMode && ngDevMode.rendererRemoveStyle++;
-      renderer.removeStyle(rNode, prop, flags);
-    } else {
-      const isImportant = typeof value === "string" ? value.endsWith("!important") : false;
-      if (isImportant) {
-        value = value.slice(0, -10);
-        flags |= RendererStyleFlags2.Important;
-      }
-      ngDevMode && ngDevMode.rendererSetStyle++;
-      renderer.setStyle(rNode, prop, value, flags);
-    }
-  }
-}
-function writeDirectStyle(renderer, element, newValue) {
-  ngDevMode && assertString(newValue, "'newValue' should be a string");
-  renderer.setAttribute(element, "style", newValue);
-  ngDevMode && ngDevMode.rendererSetStyle++;
-}
-function writeDirectClass(renderer, element, newValue) {
-  ngDevMode && assertString(newValue, "'newValue' should be a string");
-  if (newValue === "") {
-    renderer.removeAttribute(element, "class");
-  } else {
-    renderer.setAttribute(element, "class", newValue);
-  }
-  ngDevMode && ngDevMode.rendererSetClassName++;
-}
-function setupStaticAttributes(renderer, element, tNode) {
-  const {
-    mergedAttrs,
-    classes,
-    styles
-  } = tNode;
-  if (mergedAttrs !== null) {
-    setUpAttributes(renderer, element, mergedAttrs);
-  }
-  if (classes !== null) {
-    writeDirectClass(renderer, element, classes);
-  }
-  if (styles !== null) {
-    writeDirectStyle(renderer, element, styles);
-  }
-}
 function classIndexOf(className, classToSearch, startingIndex) {
   ngDevMode && assertNotEqual(classToSearch, "", 'can not look for "" string.');
   let end = className.length;
@@ -9193,6 +8597,73 @@ function writeToDirectiveInput(def, instance, publicName, privateName, flags, va
     setActiveConsumer(prevConsumer);
   }
 }
+function createTextNode(renderer, value) {
+  ngDevMode && ngDevMode.rendererCreateTextNode++;
+  ngDevMode && ngDevMode.rendererSetText++;
+  return renderer.createText(value);
+}
+function updateTextNode(renderer, rNode, value) {
+  ngDevMode && ngDevMode.rendererSetText++;
+  renderer.setValue(rNode, value);
+}
+function createCommentNode(renderer, value) {
+  ngDevMode && ngDevMode.rendererCreateComment++;
+  return renderer.createComment(escapeCommentText(value));
+}
+function createElementNode(renderer, name, namespace) {
+  ngDevMode && ngDevMode.rendererCreateElement++;
+  return renderer.createElement(name, namespace);
+}
+function nativeInsertBefore(renderer, parent, child, beforeNode, isMove) {
+  ngDevMode && ngDevMode.rendererInsertBefore++;
+  renderer.insertBefore(parent, child, beforeNode, isMove);
+}
+function nativeAppendChild(renderer, parent, child) {
+  ngDevMode && ngDevMode.rendererAppendChild++;
+  ngDevMode && assertDefined(parent, "parent node must be defined");
+  renderer.appendChild(parent, child);
+}
+function nativeAppendOrInsertBefore(renderer, parent, child, beforeNode, isMove) {
+  if (beforeNode !== null) {
+    nativeInsertBefore(renderer, parent, child, beforeNode, isMove);
+  } else {
+    nativeAppendChild(renderer, parent, child);
+  }
+}
+function nativeRemoveNode(renderer, rNode, isHostElement) {
+  ngDevMode && ngDevMode.rendererRemoveNode++;
+  renderer.removeChild(null, rNode, isHostElement);
+}
+function writeDirectStyle(renderer, element, newValue) {
+  ngDevMode && assertString(newValue, "'newValue' should be a string");
+  renderer.setAttribute(element, "style", newValue);
+  ngDevMode && ngDevMode.rendererSetStyle++;
+}
+function writeDirectClass(renderer, element, newValue) {
+  ngDevMode && assertString(newValue, "'newValue' should be a string");
+  if (newValue === "") {
+    renderer.removeAttribute(element, "class");
+  } else {
+    renderer.setAttribute(element, "class", newValue);
+  }
+  ngDevMode && ngDevMode.rendererSetClassName++;
+}
+function setupStaticAttributes(renderer, element, tNode) {
+  const {
+    mergedAttrs,
+    classes,
+    styles
+  } = tNode;
+  if (mergedAttrs !== null) {
+    setUpAttributes(renderer, element, mergedAttrs);
+  }
+  if (classes !== null) {
+    writeDirectClass(renderer, element, classes);
+  }
+  if (styles !== null) {
+    writeDirectStyle(renderer, element, styles);
+  }
+}
 function createLView(parentLView, tView, context2, flags, host, tHostNode, environment2, renderer, injector, embeddedViewInjector, hydrationInfo) {
   const lView = tView.blueprint.slice();
   lView[HOST] = host;
@@ -9216,51 +8687,6 @@ function createLView(parentLView, tView, context2, flags, host, tHostNode, envir
   ngDevMode && assertEqual(tView.type == 2 ? parentLView !== null : true, true, "Embedded views must have parentLView");
   lView[DECLARATION_COMPONENT_VIEW] = tView.type == 2 ? parentLView[DECLARATION_COMPONENT_VIEW] : lView;
   return lView;
-}
-function getOrCreateTNode(tView, index, type, name, attrs) {
-  ngDevMode && index !== 0 && // 0 are bogus nodes and they are OK. See `createContainerRef` in
-  // `view_engine_compatibility` for additional context.
-  assertGreaterThanOrEqual(index, HEADER_OFFSET, "TNodes can't be in the LView header.");
-  ngDevMode && assertPureTNodeType(type);
-  let tNode = tView.data[index];
-  if (tNode === null) {
-    tNode = createTNodeAtIndex(tView, index, type, name, attrs);
-    if (isInI18nBlock()) {
-      tNode.flags |= 32;
-    }
-  } else if (tNode.type & 64) {
-    tNode.type = type;
-    tNode.value = name;
-    tNode.attrs = attrs;
-    const parent = getCurrentParentTNode();
-    tNode.injectorIndex = parent === null ? -1 : parent.injectorIndex;
-    ngDevMode && assertTNodeForTView(tNode, tView);
-    ngDevMode && assertEqual(index, tNode.index, "Expecting same index");
-  }
-  setCurrentTNode(tNode, true);
-  return tNode;
-}
-function createTNodeAtIndex(tView, index, type, name, attrs) {
-  const currentTNode = getCurrentTNodePlaceholderOk();
-  const isParent = isCurrentTNodeParent();
-  const parent = isParent ? currentTNode : currentTNode && currentTNode.parent;
-  const tNode = tView.data[index] = createTNode(tView, parent, type, index, name, attrs);
-  if (tView.firstChild === null) {
-    tView.firstChild = tNode;
-  }
-  if (currentTNode !== null) {
-    if (isParent) {
-      if (currentTNode.child == null && tNode.parent !== null) {
-        currentTNode.child = tNode;
-      }
-    } else {
-      if (currentTNode.next === null) {
-        currentTNode.next = tNode;
-        tNode.prev = currentTNode;
-      }
-    }
-  }
-  return tNode;
 }
 function allocExpando(tView, lView, numSlotsToAlloc, initialValue) {
   if (numSlotsToAlloc === 0) return -1;
@@ -9384,58 +8810,6 @@ function applyRootElementTransform(rootElement) {
   _applyRootElementTransformImpl(rootElement);
 }
 var _applyRootElementTransformImpl = () => null;
-function createTNode(tView, tParent, type, index, value, attrs) {
-  ngDevMode && index !== 0 && // 0 are bogus nodes and they are OK. See `createContainerRef` in
-  // `view_engine_compatibility` for additional context.
-  assertGreaterThanOrEqual(index, HEADER_OFFSET, "TNodes can't be in the LView header.");
-  ngDevMode && assertNotSame(attrs, void 0, "'undefined' is not valid value for 'attrs'");
-  ngDevMode && ngDevMode.tNode++;
-  ngDevMode && tParent && assertTNodeForTView(tParent, tView);
-  let injectorIndex = tParent ? tParent.injectorIndex : -1;
-  let flags = 0;
-  if (isInSkipHydrationBlock$1()) {
-    flags |= 128;
-  }
-  const tNode = {
-    type,
-    index,
-    insertBeforeIndex: null,
-    injectorIndex,
-    directiveStart: -1,
-    directiveEnd: -1,
-    directiveStylingLast: -1,
-    componentOffset: -1,
-    propertyBindings: null,
-    flags,
-    providerIndexes: 0,
-    value,
-    attrs,
-    mergedAttrs: null,
-    localNames: null,
-    initialInputs: void 0,
-    inputs: null,
-    outputs: null,
-    tView: null,
-    next: null,
-    prev: null,
-    projectionNext: null,
-    child: null,
-    parent: tParent,
-    projection: null,
-    styles: null,
-    stylesWithoutHost: null,
-    residualStyles: void 0,
-    classes: null,
-    classesWithoutHost: null,
-    residualClasses: void 0,
-    classBindings: 0,
-    styleBindings: 0
-  };
-  if (ngDevMode) {
-    Object.seal(tNode);
-  }
-  return tNode;
-}
 function captureNodeBindings(mode, aliasMap, directiveIndex, bindingsResult, hostDirectiveAliasMap) {
   for (let publicName in aliasMap) {
     if (!aliasMap.hasOwnProperty(publicName)) {
@@ -10012,6 +9386,532 @@ function renderChildComponents(hostLView, components) {
     renderComponent(hostLView, components[i]);
   }
 }
+var RendererStyleFlags2;
+(function(RendererStyleFlags22) {
+  RendererStyleFlags22[RendererStyleFlags22["Important"] = 1] = "Important";
+  RendererStyleFlags22[RendererStyleFlags22["DashCase"] = 2] = "DashCase";
+})(RendererStyleFlags2 || (RendererStyleFlags2 = {}));
+var _icuContainerIterate;
+function icuContainerIterate(tIcuContainerNode, lView) {
+  return _icuContainerIterate(tIcuContainerNode, lView);
+}
+function ensureIcuContainerVisitorLoaded(loader) {
+  if (_icuContainerIterate === void 0) {
+    _icuContainerIterate = loader();
+  }
+}
+function applyToElementOrContainer(action, renderer, parent, lNodeToHandle, beforeNode) {
+  if (lNodeToHandle != null) {
+    let lContainer;
+    let isComponent2 = false;
+    if (isLContainer(lNodeToHandle)) {
+      lContainer = lNodeToHandle;
+    } else if (isLView(lNodeToHandle)) {
+      isComponent2 = true;
+      ngDevMode && assertDefined(lNodeToHandle[HOST], "HOST must be defined for a component LView");
+      lNodeToHandle = lNodeToHandle[HOST];
+    }
+    const rNode = unwrapRNode(lNodeToHandle);
+    if (action === 0 && parent !== null) {
+      if (beforeNode == null) {
+        nativeAppendChild(renderer, parent, rNode);
+      } else {
+        nativeInsertBefore(renderer, parent, rNode, beforeNode || null, true);
+      }
+    } else if (action === 1 && parent !== null) {
+      nativeInsertBefore(renderer, parent, rNode, beforeNode || null, true);
+    } else if (action === 2) {
+      nativeRemoveNode(renderer, rNode, isComponent2);
+    } else if (action === 3) {
+      ngDevMode && ngDevMode.rendererDestroyNode++;
+      renderer.destroyNode(rNode);
+    }
+    if (lContainer != null) {
+      applyContainer(renderer, action, lContainer, parent, beforeNode);
+    }
+  }
+}
+function removeViewFromDOM(tView, lView) {
+  detachViewFromDOM(tView, lView);
+  lView[HOST] = null;
+  lView[T_HOST] = null;
+}
+function addViewToDOM(tView, parentTNode, renderer, lView, parentNativeNode, beforeNode) {
+  lView[HOST] = parentNativeNode;
+  lView[T_HOST] = parentTNode;
+  applyView(tView, lView, renderer, 1, parentNativeNode, beforeNode);
+}
+function detachViewFromDOM(tView, lView) {
+  lView[ENVIRONMENT].changeDetectionScheduler?.notify(
+    10
+    /* NotificationSource.ViewDetachedFromDOM */
+  );
+  applyView(tView, lView, lView[RENDERER], 2, null, null);
+}
+function destroyViewTree(rootView) {
+  let lViewOrLContainer = rootView[CHILD_HEAD];
+  if (!lViewOrLContainer) {
+    return cleanUpView(rootView[TVIEW], rootView);
+  }
+  while (lViewOrLContainer) {
+    let next = null;
+    if (isLView(lViewOrLContainer)) {
+      next = lViewOrLContainer[CHILD_HEAD];
+    } else {
+      ngDevMode && assertLContainer(lViewOrLContainer);
+      const firstView = lViewOrLContainer[CONTAINER_HEADER_OFFSET];
+      if (firstView) next = firstView;
+    }
+    if (!next) {
+      while (lViewOrLContainer && !lViewOrLContainer[NEXT] && lViewOrLContainer !== rootView) {
+        if (isLView(lViewOrLContainer)) {
+          cleanUpView(lViewOrLContainer[TVIEW], lViewOrLContainer);
+        }
+        lViewOrLContainer = lViewOrLContainer[PARENT];
+      }
+      if (lViewOrLContainer === null) lViewOrLContainer = rootView;
+      if (isLView(lViewOrLContainer)) {
+        cleanUpView(lViewOrLContainer[TVIEW], lViewOrLContainer);
+      }
+      next = lViewOrLContainer && lViewOrLContainer[NEXT];
+    }
+    lViewOrLContainer = next;
+  }
+}
+function insertView(tView, lView, lContainer, index) {
+  ngDevMode && assertLView(lView);
+  ngDevMode && assertLContainer(lContainer);
+  const indexInContainer = CONTAINER_HEADER_OFFSET + index;
+  const containerLength = lContainer.length;
+  if (index > 0) {
+    lContainer[indexInContainer - 1][NEXT] = lView;
+  }
+  if (index < containerLength - CONTAINER_HEADER_OFFSET) {
+    lView[NEXT] = lContainer[indexInContainer];
+    addToArray(lContainer, CONTAINER_HEADER_OFFSET + index, lView);
+  } else {
+    lContainer.push(lView);
+    lView[NEXT] = null;
+  }
+  lView[PARENT] = lContainer;
+  const declarationLContainer = lView[DECLARATION_LCONTAINER];
+  if (declarationLContainer !== null && lContainer !== declarationLContainer) {
+    trackMovedView(declarationLContainer, lView);
+  }
+  const lQueries = lView[QUERIES];
+  if (lQueries !== null) {
+    lQueries.insertView(tView);
+  }
+  updateAncestorTraversalFlagsOnAttach(lView);
+  lView[FLAGS] |= 128;
+}
+function trackMovedView(declarationContainer, lView) {
+  ngDevMode && assertDefined(lView, "LView required");
+  ngDevMode && assertLContainer(declarationContainer);
+  const movedViews = declarationContainer[MOVED_VIEWS];
+  const parent = lView[PARENT];
+  ngDevMode && assertDefined(parent, "missing parent");
+  if (isLView(parent)) {
+    declarationContainer[FLAGS] |= 2;
+  } else {
+    const insertedComponentLView = parent[PARENT][DECLARATION_COMPONENT_VIEW];
+    ngDevMode && assertDefined(insertedComponentLView, "Missing insertedComponentLView");
+    const declaredComponentLView = lView[DECLARATION_COMPONENT_VIEW];
+    ngDevMode && assertDefined(declaredComponentLView, "Missing declaredComponentLView");
+    if (declaredComponentLView !== insertedComponentLView) {
+      declarationContainer[FLAGS] |= 2;
+    }
+  }
+  if (movedViews === null) {
+    declarationContainer[MOVED_VIEWS] = [lView];
+  } else {
+    movedViews.push(lView);
+  }
+}
+function detachMovedView(declarationContainer, lView) {
+  ngDevMode && assertLContainer(declarationContainer);
+  ngDevMode && assertDefined(declarationContainer[MOVED_VIEWS], "A projected view should belong to a non-empty projected views collection");
+  const movedViews = declarationContainer[MOVED_VIEWS];
+  const declarationViewIndex = movedViews.indexOf(lView);
+  movedViews.splice(declarationViewIndex, 1);
+}
+function detachView(lContainer, removeIndex) {
+  if (lContainer.length <= CONTAINER_HEADER_OFFSET) return;
+  const indexInContainer = CONTAINER_HEADER_OFFSET + removeIndex;
+  const viewToDetach = lContainer[indexInContainer];
+  if (viewToDetach) {
+    const declarationLContainer = viewToDetach[DECLARATION_LCONTAINER];
+    if (declarationLContainer !== null && declarationLContainer !== lContainer) {
+      detachMovedView(declarationLContainer, viewToDetach);
+    }
+    if (removeIndex > 0) {
+      lContainer[indexInContainer - 1][NEXT] = viewToDetach[NEXT];
+    }
+    const removedLView = removeFromArray(lContainer, CONTAINER_HEADER_OFFSET + removeIndex);
+    removeViewFromDOM(viewToDetach[TVIEW], viewToDetach);
+    const lQueries = removedLView[QUERIES];
+    if (lQueries !== null) {
+      lQueries.detachView(removedLView[TVIEW]);
+    }
+    viewToDetach[PARENT] = null;
+    viewToDetach[NEXT] = null;
+    viewToDetach[FLAGS] &= ~128;
+  }
+  return viewToDetach;
+}
+function destroyLView(tView, lView) {
+  if (isDestroyed(lView)) {
+    return;
+  }
+  const renderer = lView[RENDERER];
+  if (renderer.destroyNode) {
+    applyView(tView, lView, renderer, 3, null, null);
+  }
+  destroyViewTree(lView);
+}
+function cleanUpView(tView, lView) {
+  if (isDestroyed(lView)) {
+    return;
+  }
+  const prevConsumer = setActiveConsumer(null);
+  try {
+    lView[FLAGS] &= ~128;
+    lView[FLAGS] |= 256;
+    lView[REACTIVE_TEMPLATE_CONSUMER] && consumerDestroy(lView[REACTIVE_TEMPLATE_CONSUMER]);
+    executeOnDestroys(tView, lView);
+    processCleanups(tView, lView);
+    if (lView[TVIEW].type === 1) {
+      ngDevMode && ngDevMode.rendererDestroy++;
+      lView[RENDERER].destroy();
+    }
+    const declarationContainer = lView[DECLARATION_LCONTAINER];
+    if (declarationContainer !== null && isLContainer(lView[PARENT])) {
+      if (declarationContainer !== lView[PARENT]) {
+        detachMovedView(declarationContainer, lView);
+      }
+      const lQueries = lView[QUERIES];
+      if (lQueries !== null) {
+        lQueries.detachView(tView);
+      }
+    }
+    unregisterLView(lView);
+  } finally {
+    setActiveConsumer(prevConsumer);
+  }
+}
+function processCleanups(tView, lView) {
+  ngDevMode && assertNotReactive(processCleanups.name);
+  const tCleanup = tView.cleanup;
+  const lCleanup = lView[CLEANUP];
+  if (tCleanup !== null) {
+    for (let i = 0; i < tCleanup.length - 1; i += 2) {
+      if (typeof tCleanup[i] === "string") {
+        const targetIdx = tCleanup[i + 3];
+        ngDevMode && assertNumber(targetIdx, "cleanup target must be a number");
+        if (targetIdx >= 0) {
+          lCleanup[targetIdx]();
+        } else {
+          lCleanup[-targetIdx].unsubscribe();
+        }
+        i += 2;
+      } else {
+        const context2 = lCleanup[tCleanup[i + 1]];
+        tCleanup[i].call(context2);
+      }
+    }
+  }
+  if (lCleanup !== null) {
+    lView[CLEANUP] = null;
+  }
+  const destroyHooks = lView[ON_DESTROY_HOOKS];
+  if (destroyHooks !== null) {
+    lView[ON_DESTROY_HOOKS] = null;
+    for (let i = 0; i < destroyHooks.length; i++) {
+      const destroyHooksFn = destroyHooks[i];
+      ngDevMode && assertFunction(destroyHooksFn, "Expecting destroy hook to be a function.");
+      destroyHooksFn();
+    }
+  }
+  const effects = lView[EFFECTS];
+  if (effects !== null) {
+    lView[EFFECTS] = null;
+    for (const effect of effects) {
+      effect.destroy();
+    }
+  }
+}
+function executeOnDestroys(tView, lView) {
+  ngDevMode && assertNotReactive(executeOnDestroys.name);
+  let destroyHooks;
+  if (tView != null && (destroyHooks = tView.destroyHooks) != null) {
+    for (let i = 0; i < destroyHooks.length; i += 2) {
+      const context2 = lView[destroyHooks[i]];
+      if (!(context2 instanceof NodeInjectorFactory)) {
+        const toCall = destroyHooks[i + 1];
+        if (Array.isArray(toCall)) {
+          for (let j = 0; j < toCall.length; j += 2) {
+            const callContext = context2[toCall[j]];
+            const hook = toCall[j + 1];
+            profiler(4, callContext, hook);
+            try {
+              hook.call(callContext);
+            } finally {
+              profiler(5, callContext, hook);
+            }
+          }
+        } else {
+          profiler(4, context2, toCall);
+          try {
+            toCall.call(context2);
+          } finally {
+            profiler(5, context2, toCall);
+          }
+        }
+      }
+    }
+  }
+}
+function getParentRElement(tView, tNode, lView) {
+  return getClosestRElement(tView, tNode.parent, lView);
+}
+function getClosestRElement(tView, tNode, lView) {
+  let parentTNode = tNode;
+  while (parentTNode !== null && parentTNode.type & (8 | 32 | 128)) {
+    tNode = parentTNode;
+    parentTNode = tNode.parent;
+  }
+  if (parentTNode === null) {
+    return lView[HOST];
+  } else {
+    ngDevMode && assertTNodeType(
+      parentTNode,
+      3 | 4
+      /* TNodeType.Container */
+    );
+    const {
+      componentOffset
+    } = parentTNode;
+    if (componentOffset > -1) {
+      ngDevMode && assertTNodeForLView(parentTNode, lView);
+      const {
+        encapsulation
+      } = tView.data[parentTNode.directiveStart + componentOffset];
+      if (encapsulation === ViewEncapsulation.None || encapsulation === ViewEncapsulation.Emulated) {
+        return null;
+      }
+    }
+    return getNativeByTNode(parentTNode, lView);
+  }
+}
+function getInsertInFrontOfRNode(parentTNode, currentTNode, lView) {
+  return _getInsertInFrontOfRNodeWithI18n(parentTNode, currentTNode, lView);
+}
+function getInsertInFrontOfRNodeWithNoI18n(parentTNode, currentTNode, lView) {
+  if (parentTNode.type & (8 | 32)) {
+    return getNativeByTNode(parentTNode, lView);
+  }
+  return null;
+}
+var _getInsertInFrontOfRNodeWithI18n = getInsertInFrontOfRNodeWithNoI18n;
+var _processI18nInsertBefore;
+function setI18nHandling(getInsertInFrontOfRNodeWithI18n2, processI18nInsertBefore2) {
+  _getInsertInFrontOfRNodeWithI18n = getInsertInFrontOfRNodeWithI18n2;
+  _processI18nInsertBefore = processI18nInsertBefore2;
+}
+function appendChild(tView, lView, childRNode, childTNode) {
+  const parentRNode = getParentRElement(tView, childTNode, lView);
+  const renderer = lView[RENDERER];
+  const parentTNode = childTNode.parent || lView[T_HOST];
+  const anchorNode = getInsertInFrontOfRNode(parentTNode, childTNode, lView);
+  if (parentRNode != null) {
+    if (Array.isArray(childRNode)) {
+      for (let i = 0; i < childRNode.length; i++) {
+        nativeAppendOrInsertBefore(renderer, parentRNode, childRNode[i], anchorNode, false);
+      }
+    } else {
+      nativeAppendOrInsertBefore(renderer, parentRNode, childRNode, anchorNode, false);
+    }
+  }
+  _processI18nInsertBefore !== void 0 && _processI18nInsertBefore(renderer, childTNode, lView, childRNode, parentRNode);
+}
+function getFirstNativeNode(lView, tNode) {
+  if (tNode !== null) {
+    ngDevMode && assertTNodeType(
+      tNode,
+      3 | 12 | 32 | 16 | 128
+      /* TNodeType.LetDeclaration */
+    );
+    const tNodeType = tNode.type;
+    if (tNodeType & 3) {
+      return getNativeByTNode(tNode, lView);
+    } else if (tNodeType & 4) {
+      return getBeforeNodeForView(-1, lView[tNode.index]);
+    } else if (tNodeType & 8) {
+      const elIcuContainerChild = tNode.child;
+      if (elIcuContainerChild !== null) {
+        return getFirstNativeNode(lView, elIcuContainerChild);
+      } else {
+        const rNodeOrLContainer = lView[tNode.index];
+        if (isLContainer(rNodeOrLContainer)) {
+          return getBeforeNodeForView(-1, rNodeOrLContainer);
+        } else {
+          return unwrapRNode(rNodeOrLContainer);
+        }
+      }
+    } else if (tNodeType & 128) {
+      return getFirstNativeNode(lView, tNode.next);
+    } else if (tNodeType & 32) {
+      let nextRNode = icuContainerIterate(tNode, lView);
+      let rNode = nextRNode();
+      return rNode || unwrapRNode(lView[tNode.index]);
+    } else {
+      const projectionNodes = getProjectionNodes(lView, tNode);
+      if (projectionNodes !== null) {
+        if (Array.isArray(projectionNodes)) {
+          return projectionNodes[0];
+        }
+        const parentView = getLViewParent(lView[DECLARATION_COMPONENT_VIEW]);
+        ngDevMode && assertParentView(parentView);
+        return getFirstNativeNode(parentView, projectionNodes);
+      } else {
+        return getFirstNativeNode(lView, tNode.next);
+      }
+    }
+  }
+  return null;
+}
+function getProjectionNodes(lView, tNode) {
+  if (tNode !== null) {
+    const componentView = lView[DECLARATION_COMPONENT_VIEW];
+    const componentHost = componentView[T_HOST];
+    const slotIdx = tNode.projection;
+    ngDevMode && assertProjectionSlots(lView);
+    return componentHost.projection[slotIdx];
+  }
+  return null;
+}
+function getBeforeNodeForView(viewIndexInContainer, lContainer) {
+  const nextViewIndex = CONTAINER_HEADER_OFFSET + viewIndexInContainer + 1;
+  if (nextViewIndex < lContainer.length) {
+    const lView = lContainer[nextViewIndex];
+    const firstTNodeOfView = lView[TVIEW].firstChild;
+    if (firstTNodeOfView !== null) {
+      return getFirstNativeNode(lView, firstTNodeOfView);
+    }
+  }
+  return lContainer[NATIVE];
+}
+function applyNodes(renderer, action, tNode, lView, parentRElement, beforeNode, isProjection) {
+  while (tNode != null) {
+    ngDevMode && assertTNodeForLView(tNode, lView);
+    if (tNode.type === 128) {
+      tNode = tNode.next;
+      continue;
+    }
+    ngDevMode && assertTNodeType(
+      tNode,
+      3 | 12 | 16 | 32
+      /* TNodeType.Icu */
+    );
+    const rawSlotValue = lView[tNode.index];
+    const tNodeType = tNode.type;
+    if (isProjection) {
+      if (action === 0) {
+        rawSlotValue && attachPatchData(unwrapRNode(rawSlotValue), lView);
+        tNode.flags |= 2;
+      }
+    }
+    if ((tNode.flags & 32) !== 32) {
+      if (tNodeType & 8) {
+        applyNodes(renderer, action, tNode.child, lView, parentRElement, beforeNode, false);
+        applyToElementOrContainer(action, renderer, parentRElement, rawSlotValue, beforeNode);
+      } else if (tNodeType & 32) {
+        const nextRNode = icuContainerIterate(tNode, lView);
+        let rNode;
+        while (rNode = nextRNode()) {
+          applyToElementOrContainer(action, renderer, parentRElement, rNode, beforeNode);
+        }
+        applyToElementOrContainer(action, renderer, parentRElement, rawSlotValue, beforeNode);
+      } else if (tNodeType & 16) {
+        applyProjectionRecursive(renderer, action, lView, tNode, parentRElement, beforeNode);
+      } else {
+        ngDevMode && assertTNodeType(
+          tNode,
+          3 | 4
+          /* TNodeType.Container */
+        );
+        applyToElementOrContainer(action, renderer, parentRElement, rawSlotValue, beforeNode);
+      }
+    }
+    tNode = isProjection ? tNode.projectionNext : tNode.next;
+  }
+}
+function applyView(tView, lView, renderer, action, parentRElement, beforeNode) {
+  applyNodes(renderer, action, tView.firstChild, lView, parentRElement, beforeNode, false);
+}
+function applyProjection(tView, lView, tProjectionNode) {
+  const renderer = lView[RENDERER];
+  const parentRNode = getParentRElement(tView, tProjectionNode, lView);
+  const parentTNode = tProjectionNode.parent || lView[T_HOST];
+  let beforeNode = getInsertInFrontOfRNode(parentTNode, tProjectionNode, lView);
+  applyProjectionRecursive(renderer, 0, lView, tProjectionNode, parentRNode, beforeNode);
+}
+function applyProjectionRecursive(renderer, action, lView, tProjectionNode, parentRElement, beforeNode) {
+  const componentLView = lView[DECLARATION_COMPONENT_VIEW];
+  const componentNode = componentLView[T_HOST];
+  ngDevMode && assertEqual(typeof tProjectionNode.projection, "number", "expecting projection index");
+  const nodeToProjectOrRNodes = componentNode.projection[tProjectionNode.projection];
+  if (Array.isArray(nodeToProjectOrRNodes)) {
+    for (let i = 0; i < nodeToProjectOrRNodes.length; i++) {
+      const rNode = nodeToProjectOrRNodes[i];
+      applyToElementOrContainer(action, renderer, parentRElement, rNode, beforeNode);
+    }
+  } else {
+    let nodeToProject = nodeToProjectOrRNodes;
+    const projectedComponentLView = componentLView[PARENT];
+    if (hasInSkipHydrationBlockFlag(tProjectionNode)) {
+      nodeToProject.flags |= 128;
+    }
+    applyNodes(renderer, action, nodeToProject, projectedComponentLView, parentRElement, beforeNode, true);
+  }
+}
+function applyContainer(renderer, action, lContainer, parentRElement, beforeNode) {
+  ngDevMode && assertLContainer(lContainer);
+  const anchor = lContainer[NATIVE];
+  const native = unwrapRNode(lContainer);
+  if (anchor !== native) {
+    applyToElementOrContainer(action, renderer, parentRElement, anchor, beforeNode);
+  }
+  for (let i = CONTAINER_HEADER_OFFSET; i < lContainer.length; i++) {
+    const lView = lContainer[i];
+    applyView(lView[TVIEW], lView, renderer, action, parentRElement, anchor);
+  }
+}
+function applyStyling(renderer, isClassBased, rNode, prop, value) {
+  if (isClassBased) {
+    if (!value) {
+      ngDevMode && ngDevMode.rendererRemoveClass++;
+      renderer.removeClass(rNode, prop);
+    } else {
+      ngDevMode && ngDevMode.rendererAddClass++;
+      renderer.addClass(rNode, prop);
+    }
+  } else {
+    let flags = prop.indexOf("-") === -1 ? void 0 : RendererStyleFlags2.DashCase;
+    if (value == null) {
+      ngDevMode && ngDevMode.rendererRemoveStyle++;
+      renderer.removeStyle(rNode, prop, flags);
+    } else {
+      const isImportant = typeof value === "string" ? value.endsWith("!important") : false;
+      if (isImportant) {
+        value = value.slice(0, -10);
+        flags |= RendererStyleFlags2.Important;
+      }
+      ngDevMode && ngDevMode.rendererSetStyle++;
+      renderer.setStyle(rNode, prop, value, flags);
+    }
+  }
+}
 function createAndRenderEmbeddedLView(declarationLView, templateTNode, context2, options) {
   const prevConsumer = setActiveConsumer(null);
   try {
@@ -10052,7 +9952,7 @@ function addLViewToLContainer(lContainer, lView, index, addToDOM = true) {
   if (addToDOM) {
     const beforeNode = getBeforeNodeForView(index, lContainer);
     const renderer = lView[RENDERER];
-    const parentRNode = nativeParentNode(renderer, lContainer[NATIVE]);
+    const parentRNode = renderer.parentNode(lContainer[NATIVE]);
     if (parentRNode !== null) {
       addViewToDOM(tView, lContainer[T_HOST], renderer, lView, parentRNode, beforeNode);
     }
@@ -11041,6 +10941,106 @@ function processI18nInsertBefore(renderer, childTNode, lView, childRNode, parent
     }
   }
 }
+function getOrCreateTNode(tView, index, type, name, attrs) {
+  ngDevMode && index !== 0 && // 0 are bogus nodes and they are OK. See `createContainerRef` in
+  // `view_engine_compatibility` for additional context.
+  assertGreaterThanOrEqual(index, HEADER_OFFSET, "TNodes can't be in the LView header.");
+  ngDevMode && assertPureTNodeType(type);
+  let tNode = tView.data[index];
+  if (tNode === null) {
+    tNode = createTNodeAtIndex(tView, index, type, name, attrs);
+    if (isInI18nBlock()) {
+      tNode.flags |= 32;
+    }
+  } else if (tNode.type & 64) {
+    tNode.type = type;
+    tNode.value = name;
+    tNode.attrs = attrs;
+    const parent = getCurrentParentTNode();
+    tNode.injectorIndex = parent === null ? -1 : parent.injectorIndex;
+    ngDevMode && assertTNodeForTView(tNode, tView);
+    ngDevMode && assertEqual(index, tNode.index, "Expecting same index");
+  }
+  setCurrentTNode(tNode, true);
+  return tNode;
+}
+function createTNodeAtIndex(tView, index, type, name, attrs) {
+  const currentTNode = getCurrentTNodePlaceholderOk();
+  const isParent = isCurrentTNodeParent();
+  const parent = isParent ? currentTNode : currentTNode && currentTNode.parent;
+  const tNode = tView.data[index] = createTNode(tView, parent, type, index, name, attrs);
+  linkTNodeInTView(tView, tNode, currentTNode, isParent);
+  return tNode;
+}
+function linkTNodeInTView(tView, tNode, currentTNode, isParent) {
+  if (tView.firstChild === null) {
+    tView.firstChild = tNode;
+  }
+  if (currentTNode !== null) {
+    if (isParent) {
+      if (currentTNode.child == null && tNode.parent !== null) {
+        currentTNode.child = tNode;
+      }
+    } else {
+      if (currentTNode.next === null) {
+        currentTNode.next = tNode;
+        tNode.prev = currentTNode;
+      }
+    }
+  }
+}
+function createTNode(tView, tParent, type, index, value, attrs) {
+  ngDevMode && index !== 0 && // 0 are bogus nodes and they are OK. See `createContainerRef` in
+  // `view_engine_compatibility` for additional context.
+  assertGreaterThanOrEqual(index, HEADER_OFFSET, "TNodes can't be in the LView header.");
+  ngDevMode && assertNotSame(attrs, void 0, "'undefined' is not valid value for 'attrs'");
+  ngDevMode && ngDevMode.tNode++;
+  ngDevMode && tParent && assertTNodeForTView(tParent, tView);
+  let injectorIndex = tParent ? tParent.injectorIndex : -1;
+  let flags = 0;
+  if (isInSkipHydrationBlock$1()) {
+    flags |= 128;
+  }
+  const tNode = {
+    type,
+    index,
+    insertBeforeIndex: null,
+    injectorIndex,
+    directiveStart: -1,
+    directiveEnd: -1,
+    directiveStylingLast: -1,
+    componentOffset: -1,
+    propertyBindings: null,
+    flags,
+    providerIndexes: 0,
+    value,
+    attrs,
+    mergedAttrs: null,
+    localNames: null,
+    initialInputs: void 0,
+    inputs: null,
+    outputs: null,
+    tView: null,
+    next: null,
+    prev: null,
+    projectionNext: null,
+    child: null,
+    parent: tParent,
+    projection: null,
+    styles: null,
+    stylesWithoutHost: null,
+    residualStyles: void 0,
+    classes: null,
+    classesWithoutHost: null,
+    residualClasses: void 0,
+    classBindings: 0,
+    styleBindings: 0
+  };
+  if (ngDevMode) {
+    Object.seal(tNode);
+  }
+  return tNode;
+}
 function addTNodeAndUpdateInsertBeforeIndex(previousTNodes, newTNode) {
   ngDevMode && assertEqual(newTNode.insertBeforeIndex, null, "We expect that insertBeforeIndex is not set");
   previousTNodes.push(newTNode);
@@ -11659,6 +11659,17 @@ function getNamespace(elementName) {
   const name = elementName.toLowerCase();
   return name === "svg" ? SVG_NAMESPACE : name === "math" ? MATH_ML_NAMESPACE : null;
 }
+function getRootTAttributesFromSelector(selector) {
+  const {
+    attrs,
+    classes
+  } = extractAttrsAndClassesFromSelector(selector);
+  const tAtts = attrs;
+  if (classes.length) {
+    tAtts.push(1, ...classes);
+  }
+  return tAtts;
+}
 var ComponentFactory = class extends ComponentFactory$1 {
   componentDef;
   ngModule;
@@ -11740,9 +11751,9 @@ var ComponentFactory = class extends ComponentFactory$1 {
       }
       const rootTView = createTView(0, null, null, 1, 0, null, null, null, null, null, null);
       const rootLView = createLView(null, rootTView, null, rootFlags, null, null, environment2, hostRenderer, rootViewInjector, null, hydrationInfo);
+      rootLView[HEADER_OFFSET] = hostRNode;
       enterView(rootLView);
       let component;
-      let tElementNode;
       let componentView = null;
       try {
         const rootComponentDef = this.componentDef;
@@ -11757,14 +11768,22 @@ var ComponentFactory = class extends ComponentFactory$1 {
         } else {
           rootDirectives = [rootComponentDef];
         }
-        const hostTNode = createRootComponentTNode(rootLView, hostRNode);
-        componentView = createRootComponentView(hostTNode, hostRNode, rootComponentDef, rootDirectives, rootLView, environment2, hostRenderer);
-        tElementNode = getTNode(rootTView, HEADER_OFFSET);
-        if (hostRNode) {
-          setRootNodeAttributes(hostRenderer, rootComponentDef, hostRNode, rootSelectorOrNode);
+        const tAttributes = rootSelectorOrNode ? ["ng-version", "19.1.3"] : (
+          // Extract attributes and classes from the first selector only to match VE behavior.
+          getRootTAttributesFromSelector(this.componentDef.selectors[0])
+        );
+        const hostTNode2 = getOrCreateTNode(rootTView, HEADER_OFFSET, 2, "#host", tAttributes);
+        for (const def of rootDirectives) {
+          hostTNode2.mergedAttrs = mergeHostAttrs(hostTNode2.mergedAttrs, def.hostAttrs);
         }
+        hostTNode2.mergedAttrs = mergeHostAttrs(hostTNode2.mergedAttrs, tAttributes);
+        computeStaticStyling(hostTNode2, hostTNode2.mergedAttrs, true);
+        if (hostRNode) {
+          setupStaticAttributes(hostRenderer, hostRNode, hostTNode2);
+        }
+        componentView = createRootComponentView(hostTNode2, hostRNode, rootComponentDef, rootDirectives, rootLView, environment2);
         if (projectableNodes !== void 0) {
-          projectNodes(tElementNode, this.ngContentSelectors, projectableNodes);
+          projectNodes(hostTNode2, this.ngContentSelectors, projectableNodes);
         }
         component = createRootComponent(componentView, rootComponentDef, rootDirectives, hostDirectiveDefs, rootLView, [LifecycleHooksFeature]);
         renderView(rootTView, rootLView, null);
@@ -11777,7 +11796,8 @@ var ComponentFactory = class extends ComponentFactory$1 {
       } finally {
         leaveView();
       }
-      return new ComponentRef(this.componentType, component, createElementRef(tElementNode, rootLView), rootLView, tElementNode);
+      const hostTNode = getTNode(rootTView, HEADER_OFFSET);
+      return new ComponentRef(this.componentType, component, createElementRef(hostTNode, rootLView), rootLView, hostTNode);
     } finally {
       setActiveConsumer(prevConsumer);
     }
@@ -11842,16 +11862,8 @@ var ComponentRef = class extends ComponentRef$1 {
     this.hostView.onDestroy(callback);
   }
 };
-function createRootComponentTNode(lView, rNode) {
-  const tView = lView[TVIEW];
-  const index = HEADER_OFFSET;
-  ngDevMode && assertIndexInRange(lView, index);
-  lView[index] = rNode;
-  return getOrCreateTNode(tView, index, 2, "#host", null);
-}
-function createRootComponentView(tNode, hostRNode, rootComponentDef, rootDirectives, rootView, environment2, hostRenderer) {
+function createRootComponentView(tNode, hostRNode, rootComponentDef, rootDirectives, rootView, environment2) {
   const tView = rootView[TVIEW];
-  applyRootComponentStyling(rootDirectives, tNode, hostRNode, hostRenderer);
   let hydrationInfo = null;
   if (hostRNode !== null) {
     hydrationInfo = retrieveHydrationInfo(hostRNode, rootView[INJECTOR]);
@@ -11863,17 +11875,6 @@ function createRootComponentView(tNode, hostRNode, rootComponentDef, rootDirecti
   }
   addToEndOfViewTree(rootView, componentView);
   return rootView[tNode.index] = componentView;
-}
-function applyRootComponentStyling(rootDirectives, tNode, rNode, hostRenderer) {
-  for (const def of rootDirectives) {
-    tNode.mergedAttrs = mergeHostAttrs(tNode.mergedAttrs, def.hostAttrs);
-  }
-  if (tNode.mergedAttrs !== null) {
-    computeStaticStyling(tNode, tNode.mergedAttrs, true);
-    if (rNode !== null) {
-      setupStaticAttributes(hostRenderer, rNode, tNode);
-    }
-  }
 }
 function createRootComponent(componentView, rootComponentDef, rootDirectives, hostDirectiveDefs, rootLView, hostFeatures) {
   const rootTNode = getCurrentTNode();
@@ -11900,22 +11901,6 @@ function createRootComponent(componentView, rootComponentDef, rootDirectives, ho
   }
   executeContentQueries(tView, rootTNode, rootLView);
   return component;
-}
-function setRootNodeAttributes(hostRenderer, componentDef, hostRNode, rootSelectorOrNode) {
-  if (rootSelectorOrNode) {
-    setUpAttributes(hostRenderer, hostRNode, ["ng-version", "19.1.1"]);
-  } else {
-    const {
-      attrs,
-      classes
-    } = extractAttrsAndClassesFromSelector(componentDef.selectors[0]);
-    if (attrs) {
-      setUpAttributes(hostRenderer, hostRNode, attrs);
-    }
-    if (classes && classes.length > 0) {
-      writeDirectClass(hostRenderer, hostRNode, classes.join(" "));
-    }
-  }
 }
 function projectNodes(tNode, ngContentSelectors, projectableNodes) {
   const projection = tNode.projection = [];
@@ -12127,8 +12112,8 @@ function insertAnchorNode(hostLView, hostTNode) {
   ngDevMode && ngDevMode.rendererCreateComment++;
   const commentNode = renderer.createComment(ngDevMode ? "container" : "");
   const hostNative = getNativeByTNode(hostTNode, hostLView);
-  const parentOfHostNative = nativeParentNode(renderer, hostNative);
-  nativeInsertBefore(renderer, parentOfHostNative, commentNode, nativeNextSibling(renderer, hostNative), false);
+  const parentOfHostNative = renderer.parentNode(hostNative);
+  nativeInsertBefore(renderer, parentOfHostNative, commentNode, renderer.nextSibling(hostNative), false);
   return commentNode;
 }
 var _locateOrCreateAnchorNode = createAnchorNode;
@@ -13111,7 +13096,7 @@ function getComponentId(componentDef) {
   }
   hash += 2147483647 + 1;
   const compId = "c" + hash;
-  if (typeof ngDevMode === "undefined" || ngDevMode) {
+  if ((typeof ngDevMode === "undefined" || ngDevMode) && true) {
     if (GENERATED_COMP_IDS.has(compId)) {
       const previousCompDefType = GENERATED_COMP_IDS.get(compId);
       if (previousCompDefType !== componentDef.type) {
@@ -17944,7 +17929,7 @@ function applyMutableOpCodes(tView, mutableOpCodes, lView, anchorRNode) {
           const parentIdx = getParentFromIcuCreateOpCode(opCode);
           if (rootIdx === null) {
             rootIdx = parentIdx;
-            rootRNode = nativeParentNode(renderer, anchorRNode);
+            rootRNode = renderer.parentNode(anchorRNode);
           }
           let insertInFrontOf;
           let parentRNode;
@@ -19913,33 +19898,59 @@ function \u0275setClassDebugInfo(type, debugInfo) {
 }
 function \u0275\u0275replaceMetadata(type, applyMetadata, namespaces, locals) {
   ngDevMode && assertComponentDef(type);
-  const oldDef = getComponentDef(type);
+  const currentDef = getComponentDef(type);
   applyMetadata.apply(null, [type, namespaces, ...locals]);
+  const {
+    newDef,
+    oldDef
+  } = mergeWithExistingDefinition(currentDef, getComponentDef(type));
+  type[NG_COMP_DEF] = newDef;
   if (oldDef.tView) {
     const trackedViews = getTrackedLViews().values();
     for (const root of trackedViews) {
       if (root[FLAGS] & 512 && root[PARENT] === null) {
-        recreateMatchingLViews(oldDef, root);
+        recreateMatchingLViews(newDef, oldDef, root);
       }
     }
   }
 }
-function recreateMatchingLViews(oldDef, rootLView) {
+function mergeWithExistingDefinition(currentDef, newDef) {
+  const clone = __spreadValues({}, currentDef);
+  const replacement = Object.assign(currentDef, newDef, {
+    // We need to keep the existing directive and pipe defs, because they can get patched on
+    // by a call to `setComponentScope` from a module file. That call won't make it into the
+    // HMR replacement function, because it lives in an entirely different file.
+    directiveDefs: clone.directiveDefs,
+    pipeDefs: clone.pipeDefs,
+    // Preserve the old `setInput` function, because it has some state.
+    // This is fine, because the component instance is preserved as well.
+    setInput: clone.setInput
+  });
+  ngDevMode && assertEqual(replacement, currentDef, "Expected definition to be merged in place");
+  return {
+    newDef: replacement,
+    oldDef: clone
+  };
+}
+function recreateMatchingLViews(newDef, oldDef, rootLView) {
   ngDevMode && assertDefined(oldDef.tView, "Expected a component definition that has been instantiated at least once");
   const tView = rootLView[TVIEW];
   if (tView === oldDef.tView) {
     ngDevMode && assertComponentDef(oldDef.type);
-    recreateLView(getComponentDef(oldDef.type), oldDef, rootLView);
+    recreateLView(newDef, oldDef, rootLView);
     return;
   }
   for (let i = HEADER_OFFSET; i < tView.bindingStartIndex; i++) {
     const current = rootLView[i];
     if (isLContainer(current)) {
-      for (let i2 = CONTAINER_HEADER_OFFSET; i2 < current.length; i2++) {
-        recreateMatchingLViews(oldDef, current[i2]);
+      if (isLView(current[HOST])) {
+        recreateMatchingLViews(newDef, oldDef, current[HOST]);
+      }
+      for (let j = CONTAINER_HEADER_OFFSET; j < current.length; j++) {
+        recreateMatchingLViews(newDef, oldDef, current[j]);
       }
     } else if (isLView(current)) {
-      recreateMatchingLViews(oldDef, current);
+      recreateMatchingLViews(newDef, oldDef, current);
     }
   }
 }
@@ -19948,7 +19959,7 @@ function clearRendererCache(factory, def) {
 }
 function recreateLView(newDef, oldDef, lView) {
   const instance = lView[CONTEXT];
-  const host = lView[HOST];
+  let host = lView[HOST];
   const parentLView = lView[PARENT];
   ngDevMode && assertLView(parentLView);
   const tNode = lView[T_HOST];
@@ -19960,12 +19971,31 @@ function recreateLView(newDef, oldDef, lView) {
   ngDevMode && assertNotEqual(newDef, oldDef, "Expected different component definition");
   const zone = lView[INJECTOR].get(NgZone, null);
   const recreate = () => {
+    if (oldDef.encapsulation === ViewEncapsulation.ShadowDom) {
+      const newHost = host.cloneNode(false);
+      host.replaceWith(newHost);
+      host = newHost;
+    }
     const newTView = getOrCreateComponentTView(newDef);
-    const rendererFactory = lView[ENVIRONMENT].rendererFactory;
-    clearRendererCache(rendererFactory, oldDef);
-    const newLView = createLView(parentLView, newTView, instance, getInitialLViewFlagsFromDef(newDef), host, tNode, null, rendererFactory.createRenderer(host, newDef), null, null, null);
+    const newLView = createLView(
+      parentLView,
+      newTView,
+      instance,
+      getInitialLViewFlagsFromDef(newDef),
+      host,
+      tNode,
+      null,
+      null,
+      // The renderer will be created a bit further down once the old one is destroyed.
+      null,
+      null,
+      null
+    );
     replaceLViewInTree(parentLView, lView, newLView, tNode.index);
     destroyLView(lView[TVIEW], lView);
+    const rendererFactory = lView[ENVIRONMENT].rendererFactory;
+    clearRendererCache(rendererFactory, oldDef);
+    newLView[RENDERER] = rendererFactory.createRenderer(host, newDef);
     removeViewFromDOM(lView[TVIEW], lView);
     resetProjectionState(tNode);
     renderView(newTView, newLView, instance);
@@ -21107,7 +21137,7 @@ var Version = class {
     this.patch = parts.slice(2).join(".");
   }
 };
-var VERSION = new Version("19.1.1");
+var VERSION = new Version("19.1.3");
 var ModuleWithComponentFactories = class {
   ngModuleFactory;
   componentFactories;
@@ -26683,7 +26713,7 @@ function isPlatformBrowser(platformId) {
 function isPlatformServer(platformId) {
   return platformId === PLATFORM_SERVER_ID;
 }
-var VERSION2 = new Version("19.1.1");
+var VERSION2 = new Version("19.1.3");
 var ViewportScroller = class _ViewportScroller {
   // De-sugared tree-shakable injection
   // See #23917
@@ -29632,7 +29662,7 @@ var HydrationFeatureKind;
   HydrationFeatureKind2[HydrationFeatureKind2["EventReplay"] = 3] = "EventReplay";
   HydrationFeatureKind2[HydrationFeatureKind2["IncrementalHydration"] = 4] = "IncrementalHydration";
 })(HydrationFeatureKind || (HydrationFeatureKind = {}));
-var VERSION3 = new Version("19.1.1");
+var VERSION3 = new Version("19.1.3");
 
 // node_modules/@angular/forms/fesm2022/forms.mjs
 var BaseControlValueAccessor = class _BaseControlValueAccessor {
@@ -36013,7 +36043,7 @@ var UntypedFormBuilder = class _UntypedFormBuilder extends FormBuilder {
     }]
   }], null, null);
 })();
-var VERSION4 = new Version("19.1.1");
+var VERSION4 = new Version("19.1.3");
 var FormsModule = class _FormsModule {
   /**
    * @description
@@ -41596,7 +41626,7 @@ function withViewTransitions(options) {
   return routerFeature(9, providers);
 }
 var ROUTER_DIRECTIVES = [RouterOutlet, RouterLink, RouterLinkActive, \u0275EmptyOutletComponent];
-var ROUTER_FORROOT_GUARD = new InjectionToken(typeof ngDevMode === "undefined" || ngDevMode ? "router duplicate forRoot guard" : "ROUTER_FORROOT_GUARD");
+var ROUTER_FORROOT_GUARD = new InjectionToken(typeof ngDevMode === "undefined" || ngDevMode ? "router duplicate forRoot guard" : "");
 var ROUTER_PROVIDERS = [
   Location,
   {
@@ -41619,7 +41649,12 @@ var ROUTER_PROVIDERS = [
   } : []
 ];
 var RouterModule = class _RouterModule {
-  constructor(guard) {
+  constructor() {
+    if (typeof ngDevMode === "undefined" || ngDevMode) {
+      inject(ROUTER_FORROOT_GUARD, {
+        optional: true
+      });
+    }
   }
   /**
    * Creates and configures a module with all the router providers and directives.
@@ -41646,11 +41681,11 @@ var RouterModule = class _RouterModule {
         provide: ROUTES,
         multi: true,
         useValue: routes2
-      }, {
+      }, typeof ngDevMode === "undefined" || ngDevMode ? {
         provide: ROUTER_FORROOT_GUARD,
         useFactory: provideForRootGuard,
         deps: [[Router, new Optional(), new SkipSelf()]]
-      }, config2?.errorHandler ? {
+      } : [], config2?.errorHandler ? {
         provide: NAVIGATION_ERROR_HANDLER,
         useValue: config2.errorHandler
       } : [], {
@@ -41686,7 +41721,7 @@ var RouterModule = class _RouterModule {
     };
   }
   static \u0275fac = function RouterModule_Factory(__ngFactoryType__) {
-    return new (__ngFactoryType__ || _RouterModule)(\u0275\u0275inject(ROUTER_FORROOT_GUARD, 8));
+    return new (__ngFactoryType__ || _RouterModule)();
   };
   static \u0275mod = /* @__PURE__ */ \u0275\u0275defineNgModule({
     type: _RouterModule
@@ -41700,15 +41735,7 @@ var RouterModule = class _RouterModule {
       imports: ROUTER_DIRECTIVES,
       exports: ROUTER_DIRECTIVES
     }]
-  }], () => [{
-    type: void 0,
-    decorators: [{
-      type: Optional
-    }, {
-      type: Inject,
-      args: [ROUTER_FORROOT_GUARD]
-    }]
-  }], null);
+  }], () => [], null);
 })();
 function provideRouterScroller() {
   return {
@@ -41739,7 +41766,7 @@ function providePathLocationStrategy() {
   };
 }
 function provideForRootGuard(router) {
-  if ((typeof ngDevMode === "undefined" || ngDevMode) && router) {
+  if (router) {
     throw new RuntimeError(4007, `The Router was provided more than once. This can happen if 'forRoot' is used outside of the root injector. Lazy loaded modules should use RouterModule.forChild() instead.`);
   }
   return "guarded";
@@ -41763,7 +41790,7 @@ function provideRouterInitializer() {
     }
   ];
 }
-var VERSION5 = new Version("19.1.1");
+var VERSION5 = new Version("19.1.3");
 function getLoadedRoutes(route) {
   return route._loadedRoutes;
 }
@@ -42043,7 +42070,7 @@ var ProjectComponent = class _ProjectComponent {
       \u0275\u0275advance();
       \u0275\u0275property("href", ctx.link, \u0275\u0275sanitizeUrl);
     }
-  }, dependencies: [CarouselComponent], styles: ["\n\n.card[_ngcontent-%COMP%] {\n  margin: 20px 0;\n  border: none;\n  transition: transform var(--transition-speed), box-shadow var(--transition-speed);\n}\n.card[_ngcontent-%COMP%]:hover {\n  transform: translateY(-5px);\n  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);\n}\n.card-body[_ngcontent-%COMP%] {\n  background-color: var(--color-bg-secondary);\n  color: var(--color-text);\n  border-top-left-radius: 0;\n  border-top-right-radius: 0;\n  border-bottom-left-radius: var(--color-radius);\n  border-bottom-right-radius: var(--color-radius);\n  padding: 1.5rem;\n}\n.card-title[_ngcontent-%COMP%] {\n  font-size: var(--font-size-large);\n  font-weight: var(--font-weight-bold);\n  color: var(--color-heading);\n  margin-bottom: 0.5rem;\n}\n.card-text[_ngcontent-%COMP%] {\n  font-size: var(--font-size-normal);\n  color: var(--color-text);\n}\n.btn[_ngcontent-%COMP%] {\n  margin-top: 1rem;\n}\n/*# sourceMappingURL=project.component.css.map */"] });
+  }, dependencies: [CarouselComponent], styles: ["\n\n.card[_ngcontent-%COMP%] {\n  margin: 20px 0;\n  border: none;\n  transition: transform var(--transition-speed), box-shadow var(--transition-speed);\n}\n.card[_ngcontent-%COMP%]:hover {\n  transform: translateY(-5px);\n  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);\n}\n.card-body[_ngcontent-%COMP%] {\n  background-color: var(--color-bg-secondary);\n  color: var(--color-text);\n  border-top-left-radius: 0;\n  border-top-right-radius: 0;\n  border-bottom-left-radius: var(--color-radius);\n  border-bottom-right-radius: var(--color-radius);\n  padding: 1.5rem;\n}\n.card-title[_ngcontent-%COMP%] {\n  font-size: var(--font-size-large);\n  font-weight: var(--font-weight-bold);\n  color: var(--color-heading);\n  margin-bottom: 0.5rem;\n}\n.card-text[_ngcontent-%COMP%] {\n  font-size: var(--font-size-normal);\n  color: var(--color-text);\n}\n.btn[_ngcontent-%COMP%] {\n  background-color: var(--color-button-bg);\n  margin-top: 1rem;\n}\n/*# sourceMappingURL=project.component.css.map */"] });
 };
 (() => {
   (typeof ngDevMode === "undefined" || ngDevMode) && \u0275setClassDebugInfo(ProjectComponent, { className: "ProjectComponent", filePath: "src/app/components/portfolio/project/project.component.ts", lineNumber: 9 });
@@ -42535,48 +42562,115 @@ var ThemeService = class _ThemeService {
 };
 
 // src/app/components/header/header.component.ts
-var _c0 = ["navbar"];
-var _c1 = (a0) => ({ "show": a0 });
+var _c0 = (a0) => ({ "show": a0 });
+function HeaderComponent_div_7_Template(rf, ctx) {
+  if (rf & 1) {
+    const _r2 = \u0275\u0275getCurrentView();
+    \u0275\u0275elementStart(0, "div", 7)(1, "ul", 8)(2, "li", 9)(3, "a", 10);
+    \u0275\u0275listener("click", function HeaderComponent_div_7_Template_a_click_3_listener() {
+      \u0275\u0275restoreView(_r2);
+      const ctx_r2 = \u0275\u0275nextContext();
+      return \u0275\u0275resetView(ctx_r2.scrollTo("home"));
+    });
+    \u0275\u0275text(4, "In\xEDcio");
+    \u0275\u0275elementEnd()();
+    \u0275\u0275elementStart(5, "li", 9)(6, "a", 10);
+    \u0275\u0275listener("click", function HeaderComponent_div_7_Template_a_click_6_listener() {
+      \u0275\u0275restoreView(_r2);
+      const ctx_r2 = \u0275\u0275nextContext();
+      return \u0275\u0275resetView(ctx_r2.scrollTo("about"));
+    });
+    \u0275\u0275text(7, "Quem Somos");
+    \u0275\u0275elementEnd()();
+    \u0275\u0275elementStart(8, "li", 9)(9, "a", 10);
+    \u0275\u0275listener("click", function HeaderComponent_div_7_Template_a_click_9_listener() {
+      \u0275\u0275restoreView(_r2);
+      const ctx_r2 = \u0275\u0275nextContext();
+      return \u0275\u0275resetView(ctx_r2.scrollTo("services"));
+    });
+    \u0275\u0275text(10, "Servi\xE7os");
+    \u0275\u0275elementEnd()();
+    \u0275\u0275elementStart(11, "li", 9)(12, "a", 10);
+    \u0275\u0275listener("click", function HeaderComponent_div_7_Template_a_click_12_listener() {
+      \u0275\u0275restoreView(_r2);
+      const ctx_r2 = \u0275\u0275nextContext();
+      return \u0275\u0275resetView(ctx_r2.scrollTo("portfolio"));
+    });
+    \u0275\u0275text(13, "Portf\xF3lio");
+    \u0275\u0275elementEnd()();
+    \u0275\u0275elementStart(14, "li", 9)(15, "a", 10);
+    \u0275\u0275listener("click", function HeaderComponent_div_7_Template_a_click_15_listener() {
+      \u0275\u0275restoreView(_r2);
+      const ctx_r2 = \u0275\u0275nextContext();
+      return \u0275\u0275resetView(ctx_r2.scrollTo("contact"));
+    });
+    \u0275\u0275text(16, "Contato");
+    \u0275\u0275elementEnd()();
+    \u0275\u0275elementStart(17, "li", 9)(18, "button", 11);
+    \u0275\u0275listener("click", function HeaderComponent_div_7_Template_button_click_18_listener() {
+      \u0275\u0275restoreView(_r2);
+      const ctx_r2 = \u0275\u0275nextContext();
+      return \u0275\u0275resetView(ctx_r2.themeService.toggleTheme());
+    });
+    \u0275\u0275elementStart(19, "span", 12);
+    \u0275\u0275text(20);
+    \u0275\u0275elementEnd()()()()();
+  }
+  if (rf & 2) {
+    const ctx_r2 = \u0275\u0275nextContext();
+    \u0275\u0275property("ngClass", \u0275\u0275pureFunction1(12, _c0, ctx_r2.isNavbarOpen));
+    \u0275\u0275advance(3);
+    \u0275\u0275classProp("active", ctx_r2.activeNav === "home");
+    \u0275\u0275advance(3);
+    \u0275\u0275classProp("active", ctx_r2.activeNav === "about");
+    \u0275\u0275advance(3);
+    \u0275\u0275classProp("active", ctx_r2.activeNav === "services");
+    \u0275\u0275advance(3);
+    \u0275\u0275classProp("active", ctx_r2.activeNav === "portfolio");
+    \u0275\u0275advance(3);
+    \u0275\u0275classProp("active", ctx_r2.activeNav === "contact");
+    \u0275\u0275advance(5);
+    \u0275\u0275textInterpolate1(" ", ctx_r2.themeService.getIsDarkMode() ? "brightness_7" : "brightness_4", " ");
+  }
+}
 var HeaderComponent = class _HeaderComponent {
   themeService;
-  renderer;
   activeNav = "home";
   isNavbarOpen = false;
-  constructor(themeService, renderer) {
+  constructor(themeService) {
     this.themeService = themeService;
-    this.renderer = renderer;
   }
-  navbar;
   toggleTheme() {
     this.themeService.toggleTheme();
   }
   toggleNavbar() {
     this.isNavbarOpen = !this.isNavbarOpen;
-    const navbarToggleBtn = document.getElementById("navbarToggleBtn");
-    if (navbarToggleBtn) {
-      navbarToggleBtn.setAttribute("aria-expanded", this.isNavbarOpen.toString());
-    }
   }
   scrollTo(elementId) {
     const element = document.getElementById(elementId);
     this.activeNav = elementId;
     if (element) {
       element.scrollIntoView({ behavior: "smooth", block: "start" });
-      ;
+    }
+    this.isNavbarOpen = false;
+  }
+  onResize(event) {
+    if (window.innerWidth >= 992) {
+      this.isNavbarOpen = true;
+    } else {
+      this.isNavbarOpen = false;
     }
   }
   static \u0275fac = function HeaderComponent_Factory(__ngFactoryType__) {
-    return new (__ngFactoryType__ || _HeaderComponent)(\u0275\u0275directiveInject(ThemeService), \u0275\u0275directiveInject(Renderer2));
+    return new (__ngFactoryType__ || _HeaderComponent)(\u0275\u0275directiveInject(ThemeService));
   };
-  static \u0275cmp = /* @__PURE__ */ \u0275\u0275defineComponent({ type: _HeaderComponent, selectors: [["app-header"]], viewQuery: function HeaderComponent_Query(rf, ctx) {
+  static \u0275cmp = /* @__PURE__ */ \u0275\u0275defineComponent({ type: _HeaderComponent, selectors: [["app-header"]], hostBindings: function HeaderComponent_HostBindings(rf, ctx) {
     if (rf & 1) {
-      \u0275\u0275viewQuery(_c0, 5);
+      \u0275\u0275listener("resize", function HeaderComponent_resize_HostBindingHandler($event) {
+        return ctx.onResize($event);
+      }, false, \u0275\u0275resolveWindow);
     }
-    if (rf & 2) {
-      let _t;
-      \u0275\u0275queryRefresh(_t = \u0275\u0275loadQuery()) && (ctx.navbar = _t.first);
-    }
-  }, standalone: false, decls: 28, vars: 14, consts: [["navbar", ""], [1, "navbar", "navbar-expand-lg"], ["href", "#", 1, "navbar-brand"], ["src", "assets/images/logo-polara.svg", "alt", "Polara Innovations Logo", "width", "30", "height", "30"], ["type", "button", "aria-controls", "navbarNav", "aria-expanded", "false", "id", "navbarToggleBtn", 1, "navbar-toggler", 3, "click"], [1, "fas", "fa-bars"], ["id", "navbarNav", 1, "navbar-collapse", 3, "ngClass"], [1, "navbar-nav", "ms-auto"], [1, "nav-item"], [1, "nav-link", 3, "click"], [1, "btn", "theme-toggle", 3, "click"], [1, "material-icons"]], template: function HeaderComponent_Template(rf, ctx) {
+  }, standalone: false, decls: 8, vars: 1, consts: [["navbar", ""], [1, "navbar", "navbar-expand-lg"], ["href", "#", 1, "navbar-brand"], ["src", "assets/images/logo-polara.svg", "alt", "Polara Innovations Logo", "width", "30", "height", "30"], ["type", "button", "aria-controls", "navbarNav", "aria-expanded", "isNavbarOpen.toString()", "id", "navbarToggleBtn", 1, "navbar-toggler", 3, "click"], [1, "fas", "fa-bars"], ["class", "navbar-collapse", "id", "navbarNav", 3, "ngClass", 4, "ngIf"], ["id", "navbarNav", 1, "navbar-collapse", 3, "ngClass"], [1, "navbar-nav", "ms-auto"], [1, "nav-item"], [1, "nav-link", 3, "click"], [1, "btn", "theme-toggle", 3, "click"], [1, "material-icons"]], template: function HeaderComponent_Template(rf, ctx) {
     if (rf & 1) {
       const _r1 = \u0275\u0275getCurrentView();
       \u0275\u0275elementStart(0, "nav", 1, 0)(2, "a", 2);
@@ -42590,67 +42684,14 @@ var HeaderComponent = class _HeaderComponent {
       });
       \u0275\u0275element(6, "i", 5);
       \u0275\u0275elementEnd();
-      \u0275\u0275elementStart(7, "div", 6)(8, "ul", 7)(9, "li", 8)(10, "a", 9);
-      \u0275\u0275listener("click", function HeaderComponent_Template_a_click_10_listener() {
-        \u0275\u0275restoreView(_r1);
-        return \u0275\u0275resetView(ctx.scrollTo("home"));
-      });
-      \u0275\u0275text(11, "In\xEDcio");
-      \u0275\u0275elementEnd()();
-      \u0275\u0275elementStart(12, "li", 8)(13, "a", 9);
-      \u0275\u0275listener("click", function HeaderComponent_Template_a_click_13_listener() {
-        \u0275\u0275restoreView(_r1);
-        return \u0275\u0275resetView(ctx.scrollTo("about"));
-      });
-      \u0275\u0275text(14, "Quem Somos");
-      \u0275\u0275elementEnd()();
-      \u0275\u0275elementStart(15, "li", 8)(16, "a", 9);
-      \u0275\u0275listener("click", function HeaderComponent_Template_a_click_16_listener() {
-        \u0275\u0275restoreView(_r1);
-        return \u0275\u0275resetView(ctx.scrollTo("services"));
-      });
-      \u0275\u0275text(17, "Servi\xE7os");
-      \u0275\u0275elementEnd()();
-      \u0275\u0275elementStart(18, "li", 8)(19, "a", 9);
-      \u0275\u0275listener("click", function HeaderComponent_Template_a_click_19_listener() {
-        \u0275\u0275restoreView(_r1);
-        return \u0275\u0275resetView(ctx.scrollTo("portfolio"));
-      });
-      \u0275\u0275text(20, "Portf\xF3lio");
-      \u0275\u0275elementEnd()();
-      \u0275\u0275elementStart(21, "li", 8)(22, "a", 9);
-      \u0275\u0275listener("click", function HeaderComponent_Template_a_click_22_listener() {
-        \u0275\u0275restoreView(_r1);
-        return \u0275\u0275resetView(ctx.scrollTo("contact"));
-      });
-      \u0275\u0275text(23, "Contato");
-      \u0275\u0275elementEnd()();
-      \u0275\u0275elementStart(24, "li", 8)(25, "button", 10);
-      \u0275\u0275listener("click", function HeaderComponent_Template_button_click_25_listener() {
-        \u0275\u0275restoreView(_r1);
-        return \u0275\u0275resetView(ctx.themeService.toggleTheme());
-      });
-      \u0275\u0275elementStart(26, "span", 11);
-      \u0275\u0275text(27);
-      \u0275\u0275elementEnd()()()()()();
+      \u0275\u0275template(7, HeaderComponent_div_7_Template, 21, 14, "div", 6);
+      \u0275\u0275elementEnd();
     }
     if (rf & 2) {
       \u0275\u0275advance(7);
-      \u0275\u0275property("ngClass", \u0275\u0275pureFunction1(12, _c1, ctx.isNavbarOpen));
-      \u0275\u0275advance(3);
-      \u0275\u0275classProp("active", ctx.activeNav === "home");
-      \u0275\u0275advance(3);
-      \u0275\u0275classProp("active", ctx.activeNav === "about");
-      \u0275\u0275advance(3);
-      \u0275\u0275classProp("active", ctx.activeNav === "services");
-      \u0275\u0275advance(3);
-      \u0275\u0275classProp("active", ctx.activeNav === "portfolio");
-      \u0275\u0275advance(3);
-      \u0275\u0275classProp("active", ctx.activeNav === "contact");
-      \u0275\u0275advance(5);
-      \u0275\u0275textInterpolate1(" ", ctx.themeService.getIsDarkMode() ? "brightness_7" : "brightness_4", " ");
+      \u0275\u0275property("ngIf", ctx.isNavbarOpen);
     }
-  }, dependencies: [NgClass], styles: ["\n\n.navbar[_ngcontent-%COMP%] {\n  position: sticky;\n  top: 0;\n  left: 0;\n  width: 100%;\n  padding-left: 3rem;\n  padding-right: 3rem;\n  padding-top: 1rem;\n  padding-bottom: 0.5rem;\n  box-sizing: border-box;\n  background-color: var(--color-bg);\n  z-index: 1000;\n}\n.navbar-brand[_ngcontent-%COMP%] {\n  color: var(--color-text);\n  font-weight: 500;\n  font-size: 1.25rem;\n  text-decoration: none;\n}\n.navbar-nav[_ngcontent-%COMP%] {\n  gap: 1rem;\n}\n.nav-link[_ngcontent-%COMP%] {\n  -webkit-user-select: none;\n  user-select: none;\n  cursor: pointer;\n  color: var(--color-text-muted);\n  padding: 0.5rem 1rem;\n  text-decoration: none;\n  transition: color 0.3s ease, background-color 0.3s ease;\n}\n.nav-link[_ngcontent-%COMP%]:hover {\n  color: var(--color-heading);\n  background-color: var(--color-bg-muted);\n  border-radius: 5px;\n  transition: background-color 0.3s ease, color 0.3s ease;\n}\n.nav-link.active[_ngcontent-%COMP%] {\n  color: var(--color-heading);\n  background-color: var(--color-bg-muted);\n  border-radius: 5px;\n  transition: background-color 0.3s ease, color 0.3s ease;\n}\n.theme-toggle[_ngcontent-%COMP%] {\n  border: none !important;\n  background: none;\n  color: var(--color-text);\n  padding: 0.5rem 1rem;\n  transition: color 0.3s ease;\n}\n.theme-toggle[_ngcontent-%COMP%]:hover {\n  color: var(--color-heading);\n}\n.material-icons[_ngcontent-%COMP%] {\n  font-size: 24px;\n  cursor: pointer;\n}\n@media (max-width: 768px) {\n  .navbar-nav[_ngcontent-%COMP%] {\n    background-color: var(--color-bg);\n    width: 100%;\n    text-align: center;\n    margin-top: 1rem;\n  }\n  .navbar-nav[_ngcontent-%COMP%]   .nav-item[_ngcontent-%COMP%] {\n    padding: 1rem;\n  }\n  .navbar-toggler[_ngcontent-%COMP%] {\n    background: var(--color-bg);\n    border: none;\n    color: var(--color-text);\n    font-size: 30px;\n  }\n  .navbar-collapse[_ngcontent-%COMP%] {\n    display: none;\n    flex-direction: column;\n    align-items: center;\n    width: 100%;\n  }\n  .navbar-collapse.show[_ngcontent-%COMP%] {\n    display: flex;\n  }\n}\n/*# sourceMappingURL=header.component.css.map */"] });
+  }, dependencies: [NgClass, NgIf], styles: ["\n\n.navbar[_ngcontent-%COMP%] {\n  position: sticky;\n  top: 0;\n  left: 0;\n  width: 100%;\n  padding-left: 3rem;\n  padding-right: 3rem;\n  padding-top: 1rem;\n  padding-bottom: 0.5rem;\n  box-sizing: border-box;\n  background-color: var(--color-bg);\n  z-index: 1000;\n}\n.navbar-brand[_ngcontent-%COMP%] {\n  color: var(--color-text);\n  font-weight: 500;\n  font-size: 1.25rem;\n  text-decoration: none;\n}\n.navbar-nav[_ngcontent-%COMP%] {\n  gap: 1rem;\n}\n.nav-link[_ngcontent-%COMP%] {\n  -webkit-user-select: none;\n  user-select: none;\n  cursor: pointer;\n  color: var(--color-text-muted);\n  padding: 0.5rem 1rem;\n  text-decoration: none;\n  transition: color 0.3s ease, background-color 0.3s ease;\n}\n.nav-link[_ngcontent-%COMP%]:hover {\n  color: var(--color-heading);\n  background-color: var(--color-bg-muted);\n  border-radius: 5px;\n  transition: background-color 0.3s ease, color 0.3s ease;\n}\n.nav-link.active[_ngcontent-%COMP%] {\n  color: var(--color-heading);\n  background-color: var(--color-bg-muted);\n  border-radius: 5px;\n  transition: background-color 0.3s ease, color 0.3s ease;\n}\n.theme-toggle[_ngcontent-%COMP%] {\n  border: none !important;\n  background: none;\n  color: var(--color-text);\n  padding: 0.5rem 1rem;\n  transition: color 0.3s ease;\n}\n.theme-toggle[_ngcontent-%COMP%]:hover {\n  color: var(--color-heading);\n}\n.material-icons[_ngcontent-%COMP%] {\n  font-size: 24px;\n  cursor: pointer;\n}\n.navbar-collapse[_ngcontent-%COMP%] {\n  display: none;\n}\n.navbar-collapse.show[_ngcontent-%COMP%] {\n  display: block;\n}\n.navbar-toggler[_ngcontent-%COMP%] {\n  background: none;\n  border: none;\n  color: var(--color-text);\n}\n.navbar-toggler[_ngcontent-%COMP%]:hover {\n  color: var(--color-heading);\n}\n@media (max-width: 768px) {\n  .navbar-nav[_ngcontent-%COMP%] {\n    background-color: var(--color-bg);\n    width: 100%;\n    text-align: center;\n    margin-top: 2rem;\n  }\n  .navbar-nav[_ngcontent-%COMP%]   .nav-item[_ngcontent-%COMP%] {\n    padding: 1rem;\n  }\n  .navbar-toggler[_ngcontent-%COMP%] {\n    background: var(--color-bg);\n    border: none;\n    color: var(--color-text);\n    font-size: 30px;\n  }\n  .navbar-collapse[_ngcontent-%COMP%] {\n    display: none;\n    flex-direction: column;\n    align-items: center;\n    width: 100%;\n  }\n  .navbar-collapse.show[_ngcontent-%COMP%] {\n    display: flex;\n  }\n  @media (min-width: 992px) {\n    .navbar-collapse[_ngcontent-%COMP%] {\n      display: block !important;\n    }\n  }\n}\n/*# sourceMappingURL=header.component.css.map */"] });
 };
 (() => {
   (typeof ngDevMode === "undefined" || ngDevMode) && \u0275setClassDebugInfo(HeaderComponent, { className: "HeaderComponent", filePath: "src/app/components/header/header.component.ts", lineNumber: 10 });
@@ -42719,7 +42760,7 @@ var AppComponent = class _AppComponent {
 
 // src/app/components/shared/card/card.component.ts
 var _c02 = (a0, a1) => ({ "bg-dark": a0, "bg-light": a1 });
-var _c12 = (a0, a1) => ({ "text-light": a0, "text-dark": a1 });
+var _c1 = (a0, a1) => ({ "text-light": a0, "text-dark": a1 });
 var CardComponent = class _CardComponent {
   title = "";
   description = "";
@@ -42740,11 +42781,11 @@ var CardComponent = class _CardComponent {
       \u0275\u0275advance();
       \u0275\u0275property("ngClass", \u0275\u0275pureFunction2(5, _c02, ctx.color === "dark", ctx.color === "light"));
       \u0275\u0275advance(2);
-      \u0275\u0275property("ngClass", \u0275\u0275pureFunction2(8, _c12, ctx.color === "dark", ctx.color === "light"));
+      \u0275\u0275property("ngClass", \u0275\u0275pureFunction2(8, _c1, ctx.color === "dark", ctx.color === "light"));
       \u0275\u0275advance();
       \u0275\u0275textInterpolate(ctx.title);
       \u0275\u0275advance();
-      \u0275\u0275property("ngClass", \u0275\u0275pureFunction2(11, _c12, ctx.color === "dark", ctx.color === "light"));
+      \u0275\u0275property("ngClass", \u0275\u0275pureFunction2(11, _c1, ctx.color === "dark", ctx.color === "light"));
       \u0275\u0275advance();
       \u0275\u0275textInterpolate(ctx.description);
     }
@@ -42774,14 +42815,14 @@ platformBrowser().bootstrapModule(AppModule).catch((err) => console.error(err));
 
 @angular/core/fesm2022/primitives/signals.mjs:
   (**
-   * @license Angular v19.1.1
+   * @license Angular v19.1.3
    * (c) 2010-2024 Google LLC. https://angular.io/
    * License: MIT
    *)
 
 @angular/core/fesm2022/core.mjs:
   (**
-   * @license Angular v19.1.1
+   * @license Angular v19.1.3
    * (c) 2010-2024 Google LLC. https://angular.io/
    * License: MIT
    *)
@@ -42851,28 +42892,28 @@ platformBrowser().bootstrapModule(AppModule).catch((err) => console.error(err));
 
 @angular/common/fesm2022/common.mjs:
   (**
-   * @license Angular v19.1.1
+   * @license Angular v19.1.3
    * (c) 2010-2024 Google LLC. https://angular.io/
    * License: MIT
    *)
 
 @angular/platform-browser/fesm2022/platform-browser.mjs:
   (**
-   * @license Angular v19.1.1
+   * @license Angular v19.1.3
    * (c) 2010-2024 Google LLC. https://angular.io/
    * License: MIT
    *)
 
 @angular/forms/fesm2022/forms.mjs:
   (**
-   * @license Angular v19.1.1
+   * @license Angular v19.1.3
    * (c) 2010-2024 Google LLC. https://angular.io/
    * License: MIT
    *)
 
 @angular/router/fesm2022/router.mjs:
   (**
-   * @license Angular v19.1.1
+   * @license Angular v19.1.3
    * (c) 2010-2024 Google LLC. https://angular.io/
    * License: MIT
    *)
