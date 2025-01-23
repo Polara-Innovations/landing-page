@@ -1,0 +1,31 @@
+body {
+    --color-bg: #ffffff;               /* Fundo principal */
+    --color-bg-secondary: #f8f9fa;     /* Fundo de cards/seções */
+    --color-bg-muted: #f5f5f5;         /* Fundo de destaque */
+    
+    --color-text: #2d2d2d;             /* Texto principal */
+    --color-text-muted: #6c757d;       /* Texto secundário/descritivo */
+    --color-heading: #003b73;          /* Títulos */
+  
+    --color-link: #003b73;             /* Links */
+    --color-link-hover: #005f9e;       /* Links no hover */
+  
+    --color-border: #dcdcdc;           /* Bordas suaves */
+    --color-border-strong: #c0c0c0;    /* Bordas marcantes */
+  
+    --color-input-bg: #f5f5f5;         /* Fundo de inputs */
+    --color-input-border: #cccccc;     /* Bordas de inputs */
+    --color-input-focus: #003b73;      /* Borda no foco */
+  
+    --color-button-bg: #003b73;        /* Botão principal */
+    --color-button-hover: #005f9e;     /* Botão no hover */
+    --color-button-text: #ffffff;      /* Texto dos botões */
+  
+    --color-success: #28a745;          /* Verde (sucesso) */
+    --color-success-bg: #e9f7ef;       /* Fundo de sucesso */
+    --color-error: #dc3545;            /* Vermelho (erro) */
+    --color-error-bg: #f8d7da;         /* Fundo de erro */
+    --color-warning: #ffc107;          /* Amarelo (aviso) */
+    --color-warning-bg: #fff3cd;       /* Fundo de aviso */
+  }
+  

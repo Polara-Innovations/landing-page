@@ -1,1 +1,35 @@
-/* You can add global styles to this file, and also import other style files */
+@import './assets/css/theme-light.css';
+@import './assets/css/theme-dark.css';
+
+:root {
+    --color-radius: 4px;
+    --font-family: 'Montserrat', sans-serif;
+    --transition-speed: 0.3s ease;
+}
+  
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background-color: var(--color-bg);
+  font-family: var(--font-family);
+  overflow: hidden; 
+}
+
+app-root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* Altura total da tela */
+  overflow-y: auto; /* Adiciona barra de rolagem vertical */
+}
+
+.default-container {
+  width: 100%; /* Garante que a largura ocupe 100% da tela */
+  padding-left: 3rem; /* Padding esquerdo */
+  padding-right: 3rem; /* Padding direito */
+  padding-top: 2rem; /* Padding superior */
+  padding-bottom: 2rem; /* Padding inferior */
+  box-sizing: border-box; /* Garante que o padding seja calculado dentro da largura total */
+  background-color: var(--color-bg); /* Cor de fundo */
+  color: var(--color-text); /* Cor do texto */
+}

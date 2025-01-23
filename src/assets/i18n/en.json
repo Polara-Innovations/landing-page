@@ -1,0 +1,22 @@
+{
+    "CORE_VALUES": {
+        "TITLE": "Our Core Values",
+        "INNOVATION": "Innovation",
+        "INNOVATION_DESC": "Constantly pushing boundaries and exploring new possibilities.",
+        "RESILIENCE": "Resilience",
+        "RESILIENCE_DESC": "Adapting and thriving in challenging environments.",
+        "COLLABORATION": "Collaboration",
+        "COLLABORATION_DESC": "Working together to achieve extraordinary results."
+    },
+    "HERO": {
+        "TITLE": "Polara Innovations",
+        "TAGLINE": "Pioneering Tomorrow's Solutions",
+        "DESCRIPTION": "We are dedicated to pushing boundaries and creating innovative solutions that shape the future of technology."
+    },
+    "VISION_MISSION": {
+        "VISION_TITLE": "Our Vision",
+        "VISION_DESCRIPTION": "To lead global technological advancement through innovative solutions that positively impact lives.",
+        "MISSION_TITLE": "Our Mission",
+        "MISSION_DESCRIPTION": "Delivering excellence through cutting-edge technology while maintaining sustainable practices."
+    }
+}

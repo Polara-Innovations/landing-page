@@ -1,0 +1,45 @@
+/* Estilo geral para a barra de rolagem */
+body {
+    scrollbar-width: thin; /* Compatibilidade com Firefox */
+    scrollbar-color: var(--color-button-bg) var(--color-bg-muted);
+  }
+  
+  /* Para navegadores baseados em Webkit */
+  body::-webkit-scrollbar {
+    width: 12px; /* Largura da barra de rolagem */
+    height: 12px; /* Altura da barra horizontal */
+  }
+  
+  body::-webkit-scrollbar-track {
+    background: var(--color-bg-muted); /* Fundo do track */
+    border-radius: 10px; /* Arredondamento */
+  }
+  
+  body::-webkit-scrollbar-thumb {
+    background-color: var(--color-button-bg); /* Cor da barra */
+    border-radius: 10px; /* Arredondamento */
+    border: 3px solid var(--color-bg-muted); /* Espaço ao redor da barra */
+  }
+  
+  body::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-button-hover); /* Cor ao passar o mouse */
+  }
+  
+  /* Suporte ao tema escuro */
+  body.dark-mode {
+    scrollbar-color: var(--color-button-bg) var(--color-bg-secondary);
+  }
+  
+  body.dark-mode::-webkit-scrollbar-track {
+    background: var(--color-bg-secondary);
+  }
+  
+  body.dark-mode::-webkit-scrollbar-thumb {
+    background: var(--color-button-bg);
+    border: 3px solid var(--color-bg-secondary);
+  }
+  
+  body.dark-mode::-webkit-scrollbar-thumb:hover {
+    background: var(--color-button-hover);
+  }
+  

@@ -1,0 +1,47 @@
+<section id="contact" class="default-container">
+  <div class="contact-form">
+    <h2 class="text-center mb-4">Entre em Contato</h2>
+    <p class="text-center mb-4">
+      Ficaremos felizes em ouvir você! Preencha o formulário abaixo e entraremos em contato o mais breve possível.
+    </p>
+    <form (submit)="onSubmit()" #contactForm="ngForm" class="form">
+      <div class="form-group mb-3">
+        <label for="name" class="form-label">Nome</label>
+        <input
+          type="text"
+          id="name"
+          class="form-control"
+          placeholder="Seu Nome"
+          name="name"
+          [(ngModel)]="formData.name"
+          required
+        />
+      </div>
+      <div class="form-group mb-3">
+        <label for="email" class="form-label">E-mail</label>
+        <input
+          type="email"
+          id="email"
+          class="form-control"
+          placeholder="Seu E-mail"
+          name="email"
+          [(ngModel)]="formData.email"
+          required
+        />
+      </div>
+      <div class="form-group mb-4">
+        <label for="message" class="form-label">Mensagem</label>
+        <textarea
+          id="message"
+          class="form-control"
+          rows="5"
+          placeholder="Sua Mensagem"
+          name="message"
+          [(ngModel)]="formData.message"
+          required
+       ></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary w-100" [disabled]="!contactForm.form.valid">Enviar</button>
+    </form>
+  </div>
+</section>

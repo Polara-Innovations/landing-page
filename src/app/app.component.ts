@@ -1,12 +1,12 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { ThemeService } from './services/theme-service/theme.service';
 
 @Component({
+  standalone: false,
   selector: 'app-root',
-  imports: [RouterOutlet],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'polara-innovations-landing-page';
+  constructor(public themeService: ThemeService) {}
 }

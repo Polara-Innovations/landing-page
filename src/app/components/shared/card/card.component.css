@@ -1,0 +1,22 @@
+.card {
+    margin: 20px 0;
+    border: none;
+  }
+  
+  .card-title {
+    color: var(--color-heading);
+  }
+  
+  .card-body {
+    background-color: var(--color-bg-secondary);
+  }
+  
+  .bg-dark .card-body {
+    background-color: var(--color-bg);
+    color: var(--color-text-muted);
+  }
+  
+  .bg-light .card-body {
+    background-color: var(--color-bg-muted);
+    color: var(--color-text);
+  }

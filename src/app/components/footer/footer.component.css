@@ -1,0 +1,44 @@
+/* Estilos do Footer */
+.footer {
+  position: relative;
+  bottom: 0;
+  width: 100%;
+  background-color: var(--color-bg); /* Definir cor do fundo do footer */
+  color: var(--color-text); /* Cor do texto conforme o tema */
+}
+
+.footer a {
+  color: var(--color-text); /* Cor dos links */
+  transition: color 0.3s ease; /* Transição suave ao passar o mouse */
+}
+
+.footer a:hover {
+  color: var(--color-link); /* Cor dos links no hover */
+}
+
+.footer .fab {
+  font-size: 2rem; /* Ajuste o tamanho do ícone */
+  vertical-align: middle; /* Alinha os ícones com o texto */
+  transition: color 0.3s ease; /* Transição suave para a cor */
+}
+
+.footer a:hover .fab {
+  color: var(--color-link); /* Cor do ícone quando passar o mouse sobre o link */
+}
+
+.footer p {
+  margin-top: 1.5rem;
+}
+
+/* Ajustar o espaçamento entre os ícones sociais */
+.footer .social-links {
+  display: flex;
+  justify-content: center;
+  gap: 1rem; /* Espaçamento entre os links */
+}
+
+.footer .social-links a {
+  font-size: 1rem; /* Ajuste de tamanho dos links */
+  display: flex;
+  align-items: center;
+}

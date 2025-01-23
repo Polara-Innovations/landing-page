@@ -1,0 +1,78 @@
+/* Seção de Contato */
+#contact {
+  background-color: var(--color-bg); /* Alinhamento com o tema */
+  padding: 4rem 0; /* Mais padding superior e inferior */
+}
+
+.contact-form {
+  max-width: 600px;
+  margin: 0 auto; /* Centraliza o formulário */
+  background-color: var(--color-bg-muted);
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+}
+
+.contact-form h2 {
+  font-size: 2rem;
+  color: var(--color-heading);
+  margin-bottom: 1rem; /* Ajusta o espaçamento entre título e parágrafo */
+}
+
+.contact-form p {
+  font-size: 1rem;
+  color: var(--color-text-muted);
+  margin-bottom: 2rem; /* Ajuste o espaçamento para um visual mais equilibrado */
+}
+
+.form-label {
+  font-size: 1rem;
+  color: var(--color-text);
+  font-weight: 500;
+}
+
+.form-control {
+  background-color: var(--color-input-bg);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: 5px;
+  padding: 0.75rem;
+  font-size: 1rem;
+  margin-bottom: 1.25rem; /* Adiciona espaçamento entre os campos */
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--color-button-hover);
+  box-shadow: 0 0 5px var(--color-button-hover);
+}
+
+.btn-primary {
+  background-color: var(--color-button-bg);
+  border: none;
+  color: var(--color-button-text);
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  font-weight: bold;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn-primary:hover {
+  background-color: var(--color-button-hover);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .contact-form {
+    padding: 1.5rem;
+  }
+
+  .contact-form h2 {
+    font-size: 1.75rem; /* Ajusta o tamanho do título para telas menores */
+  }
+
+  .form-control {
+    font-size: 0.95rem; /* Ajusta o tamanho da fonte para melhor legibilidade em dispositivos menores */
+  }
+}
