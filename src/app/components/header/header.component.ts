@@ -9,7 +9,7 @@ import { ThemeService } from '../../services/theme-service/theme.service';
 })
 export class HeaderComponent {
   activeNav: string = 'home';
-  isNavbarOpen = false;
+  isNavbarOpen = true;
 
   constructor(public themeService: ThemeService) {}
 
