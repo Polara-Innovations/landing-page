@@ -1,5 +1,5 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
 import { ThemeService } from '../../services/theme-service/theme.service';
+import { Component, ElementRef, Renderer2, ViewChild } from '@angular/core';
 
 @Component({
   standalone: false,
@@ -8,18 +8,15 @@ import { ThemeService } from '../../services/theme-service/theme.service';
   styleUrls: ['./header.component.css']
 })
 export class HeaderComponent {
-  @ViewChild('navbar', { static: false }) navbar: ElementRef | undefined;
   activeNav: string = 'home';
   isNavbarOpen = false;
 
-  constructor(public themeService: ThemeService) {}
+  constructor(public themeService: ThemeService, private renderer: Renderer2) {}
+
+  @ViewChild('navbar', { static: false }) navbar: ElementRef | undefined;
 
   toggleTheme() {
     this.themeService.toggleTheme();
-  }
-
-  onNavClick(navItem: string): void {
-    this.activeNav = navItem;
   }
 
     toggleNavbar() {
@@ -32,15 +29,10 @@ export class HeaderComponent {
 
   scrollTo(elementId: string): void {
     const element = document.getElementById(elementId);
+    this.activeNav = elementId;
     if (element) {
-      const headerOffset = this.navbar?.nativeElement.offsetHeight; // Obtém a altura do cabeçalho
-      const elementPosition = element.getBoundingClientRect().top + window.scrollY; // Posição do elemento
-      const offsetPosition = elementPosition - headerOffset; // Calcula a posição para rolagem
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth' // Rolagem suave
-      });
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });;
     }
   }
+
 }
