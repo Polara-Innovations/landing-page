@@ -26,6 +26,9 @@ jobs:
         run: |
           npm install
 
+      - name: Install Angular CLI globally
+        run: npm install -g @angular/cli
+
       - name: Build Angular Project 🛠️
         run: |
           ng build --configuration production  # Usando a configuração de produção definida no angular.json
