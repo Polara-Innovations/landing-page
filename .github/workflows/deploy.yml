@@ -3,36 +3,36 @@ name: Build and Deploy
 on:
   push:
     branches:
-      - master  # ou a branch que você estiver usando para o desenvolvimento
+      - master  
 
 permissions:
-  contents: write  # Permissões para permitir escrita no repositório
+  contents: write  
 
 jobs:
   build-and-deploy:
-    concurrency: ci-${{ github.ref }}  # Recomendado se você pretende fazer vários deploys rapidamente
+    concurrency: ci-${{ github.ref }} 
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout 🛎️
-        uses: actions/checkout@v4  # Faz o checkout do código do repositório
+        uses: actions/checkout@v4  
 
       - name: Setup Node.js 🧑‍💻
         uses: actions/setup-node@v2
         with:
-          node-version: '22'  # Ou a versão do Node que você está usando
+          node-version: '22'  
 
       - name: Install Dependencies 📦
         run: |
-          npm install  # Instala as dependências
+          npm install
 
       - name: Build Angular Project 🛠️
         run: |
-          npm run build --prod  # Faz o build de produção do Angular
+          ng build --configuration production  # Usando a configuração de produção definida no angular.json
 
       - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@v4  # Ação para deploy no GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4 
         with:
-          folder: dist/landing-page  # Pasta de saída do build do Angular
-          branch: gh-pages  # A branch onde o site será publicado
-          token: ${{ secrets.GITHUB_TOKEN }}  # Token de acesso para o deploy
+          folder: dist/landing-page 
+          branch: gh-pages  
+          token: ${{ secrets.GITHUB_TOKEN }}  
