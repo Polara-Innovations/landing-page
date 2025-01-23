@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/components/portfolio/portfolio.component.css"],
-  "sourcesContent": ["  \n  .card {\n    margin: 20px 0;\n    border: none;\n  }\n  \n  .card-body {\n    background-color: var(--color-bg-secondary);\n    color: var(--color-text);\n  }\n  "],
-  "mappings": ";AACE,CAAC;AACC,UAAQ,KAAK;AACb,UAAQ;AACV;AAEA,CAAC;AACC,oBAAkB,IAAI;AACtB,SAAO,IAAI;AACb;",
-  "names": []
-}

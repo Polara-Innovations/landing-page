@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/components/portfolio/carousel/carousel.component.css"],
-  "sourcesContent": [".carousel-inner img {\n  width: 100%;\n  height: 100%; \n  object-fit: cover;\n  border-top-left-radius: var(--color-radius);\n  border-top-right-radius: var(--color-radius);\n  border-bottom-left-radius: 0;\n  border-bottom-right-radius: 0;\n}\n\n.carousel-control-prev,\n.carousel-control-next {\n  background-color: var(--color-bg);\n  border: none;\n  border-radius: 50%;\n  width: 40px; \n  height: 40px;\n  display: flex;\n  align-self: center;\n  align-items: center;\n  justify-content: center;\n  transition: background-color var(--transition-speed);\n}\n\n.carousel-control-prev{\n  margin-left: 0.5rem\n}\n\n.carousel-control-next{\n  margin-right: 0.5rem\n}\n\n.carousel-control-prev i,\n.carousel-control-next i {\n  color: var(--color-text); \n  font-size: 1.5rem;\n}\n\n.carousel {\n  overflow: hidden; \n}"],
-  "mappings": ";AAAA,CAAC,eAAe;AACd,SAAO;AACP,UAAQ;AACR,cAAY;AACZ,0BAAwB,IAAI;AAC5B,2BAAyB,IAAI;AAC7B,6BAA2B;AAC3B,8BAA4B;AAC9B;AAEA,CAAC;AACD,CAAC;AACC,oBAAkB,IAAI;AACtB,UAAQ;AACR,iBAAe;AACf,SAAO;AACP,UAAQ;AACR,WAAS;AACT,cAAY;AACZ,eAAa;AACb,mBAAiB;AACjB,cAAY,iBAAiB,IAAI;AACnC;AAEA,CAdC;AAeC,eAAa;AACf;AAEA,CAjBC;AAkBC,gBAAc;AAChB;AAEA,CAtBC,sBAsBsB;AACvB,CAtBC,sBAsBsB;AACrB,SAAO,IAAI;AACX,aAAW;AACb;AAEA,CAAC;AACC,YAAU;AACZ;",
-  "names": []
-}
