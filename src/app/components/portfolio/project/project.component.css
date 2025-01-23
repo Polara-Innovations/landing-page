@@ -33,5 +33,6 @@
 }
 
 .btn {
+  background-color: var(--color-button-bg);
   margin-top: 1rem;
 }

@@ -4,10 +4,11 @@
     Polara Innovations
   </a>
   <button class="navbar-toggler" type="button" (click)="toggleNavbar()"
-    aria-controls="navbarNav" aria-expanded="false" id="navbarToggleBtn">
-    <i class="fas fa-bars"></i> 
+    aria-controls="navbarNav" aria-expanded="isNavbarOpen.toString()" id="navbarToggleBtn">
+    <i class="fas fa-bars"></i>
   </button>
-  <div class="navbar-collapse" [ngClass]="{'show': isNavbarOpen}" id="navbarNav">
+
+  <div class="navbar-collapse" [ngClass]="{'show': isNavbarOpen}" *ngIf="isNavbarOpen" id="navbarNav">
     <ul class="navbar-nav ms-auto">
       <li class="nav-item">
         <a class="nav-link" (click)="scrollTo('home')" [class.active]="activeNav === 'home'">Início</a>
