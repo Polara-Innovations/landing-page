@@ -1,0 +1,26 @@
+.icon {
+    font-size: 3rem; /* Tamanho padrão dos ícones */
+    color: var(--color-heading); /* Cor padrão dos ícones */
+    transition: color var(--transition-speed);
+  }
+
+  .cards-icon {
+    font-size: 3.5rem; /* Tamanho dos ícones nos cards */
+  }
+  
+  .icon:hover {
+    color: var(--color-link); /* Cor ao passar o mouse */
+  }
+  
+  /* Exemplo de classe para ícones de status */
+  .icon-success {
+    color: var(--color-success);
+  }
+  
+  .icon-error {
+    color: var(--color-error);
+  }
+  
+  .icon-warning {
+    color: var(--color-warning);
+  }

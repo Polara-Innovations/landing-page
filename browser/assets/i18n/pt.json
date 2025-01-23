@@ -1,0 +1,22 @@
+{
+    "CORE_VALUES": {
+        "TITLE": "Nossos Valores Essenciais",
+        "INNOVATION": "Inovação",
+        "INNOVATION_DESC": "Buscamos constantemente ultrapassar limites e explorar novas possibilidades.",
+        "RESILIENCE": "Resiliência",
+        "RESILIENCE_DESC": "Adaptação e superação em ambientes desafiadores.",
+        "COLLABORATION": "Colaboração",
+        "COLLABORATION_DESC": "Trabalhamos juntos para alcançar resultados extraordinários."
+    },
+    "HERO": {
+        "TITLE": "Polara Innovations",
+        "TAGLINE": "Pioneirismo nas Soluções do Amanhã",
+        "DESCRIPTION": "Somos dedicados a ultrapassar limites e criar soluções inovadoras que moldam o futuro da tecnologia."
+    },
+    "VISION_MISSION": {
+        "VISION_TITLE": "Nossa Visão",
+        "VISION_DESCRIPTION": "Liderar o avanço tecnológico global através de soluções inovadoras que impactem positivamente a vida das pessoas.",
+        "MISSION_TITLE": "Nossa Missão",
+        "MISSION_DESCRIPTION": "Oferecer excelência através de tecnologia de ponta, mantendo práticas sustentáveis."
+    }
+}

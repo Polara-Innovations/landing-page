@@ -1,0 +1,33 @@
+body.dark-mode {
+  --color-bg: #0a1929;               /* Fundo principal - Azul escuro */
+  --color-bg-secondary: #112d4e;     /* Fundo de cards/seções - Azul médio */
+  --color-bg-muted: #1c3a5c;         /* Fundo de destaque - Azul mais claro */
+
+  --color-text: #dbe2ef;             /* Texto principal - Branco suave */
+  --color-text-muted: #9dbbd8;       /* Texto secundário/descritivo - Azul claro */
+  --color-heading: #f9f7f7;          /* Títulos - Branco puro */
+
+  --color-link: #3a7ca5;             /* Links - Azul vibrante */
+  --color-link-hover: #66a3d2;       /* Links no hover - Azul claro */
+
+  --color-border: #1b2b42;           /* Bordas suaves - Azul muito escuro */
+  --color-border-strong: #2c436f;    /* Bordas marcantes - Azul médio */
+
+  --color-input-bg: #dbe2ef;         /* Fundo de inputs - Azul escuro */
+  --color-input-border: #2a5170;     /* Bordas de inputs - Azul médio */
+  --color-input-focus: #3d91c7;      /* Borda no foco - Azul vibrante */
+
+  --color-button-bg: #1d4f91;        /* Botão principal - Azul forte */
+  --color-button-hover: #256ab2;     /* Botão no hover - Azul mais vibrante */
+  --color-button-text: #f9f7f7;      /* Texto dos botões - Branco puro */
+
+  --color-success: #28a745;          /* Verde (sucesso) */
+  --color-success-bg: #0e3923;       /* Fundo de sucesso - Verde escuro */
+  --color-error: #dc3545;            /* Vermelho (erro) */
+  --color-error-bg: #3d1c23;         /* Fundo de erro - Vermelho escuro */
+  --color-warning: #ffc107;          /* Amarelo (aviso) */
+  --color-warning-bg: #4e3910;       /* Fundo de aviso */
+
+  --color-info: #007bb5;             /* Azul informativo */
+  --color-info-bg: #0b3147;          /* Fundo informativo - Azul escuro */
+}

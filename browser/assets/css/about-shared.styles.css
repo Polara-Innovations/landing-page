@@ -1,0 +1,147 @@
+/* styles.css */
+
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  animation: fadeIn 1s ease-in;
+}
+
+.hero-content {
+  flex: 1;
+  padding-right: 2rem;
+}
+
+.hero h1 {
+  font-size: var(--font-size-xxlarge);
+}
+
+.hero .title{
+  margin: 0;
+}
+
+.hero .subtitle {
+  margin: 0;
+}
+
+.hero-image {
+  display: flex;
+  justify-content: center;
+  flex: 1;
+}
+
+.hero-image img {
+  width: 100%;
+  max-width: 30vw;
+  transition: transform 0.3s ease;
+}
+
+.hero-image img:hover {
+  transform: scale(1.05);
+}
+
+.vision-mission-grid {
+  display: flex; 
+  justify-content: space-between; 
+  gap: 2rem; 
+  flex-wrap: wrap;
+}
+
+.vision-card, .mission-card {
+  flex: 1 1 calc(50% - 2rem); 
+  max-width: calc(50% - 2rem); 
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  border-radius: 10px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background: var(--color-bg-secondary);
+  color: var(--color-text);
+}
+
+.vision-card:hover, .mission-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2); 
+}
+
+@media (max-width: 768px) {
+  .vision-mission {
+    flex-direction: column; 
+  }
+
+  .vision-card, .mission-card {
+    flex: 1 1 100%; 
+    max-width: 100%;
+  }
+}
+
+.core-values {
+  margin: 4rem 0;
+}
+
+.values-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.value-card {
+  padding: 2rem;
+  border-radius: 10px;
+  background: var(--color-bg-secondary);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.value-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1rem; 
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+  .hero {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .hero-content {
+    padding-right: 0;
+    margin-bottom: 2rem;
+  }
+
+  .vision-mission {
+    grid-template-columns: 1fr;
+  }
+
+  .values-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero h1 {
+    font-size: var(--font-size-xlarge);
+  }
+}
+
+@media print {
+  body {
+    background-color: white; 
+    color: black; 
+  }
+
+  .about-container {
+    max-width: 100%;
+    padding: 1rem;
+  }
+}
