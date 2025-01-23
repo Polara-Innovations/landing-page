@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/components/services/services.component.css"],
+  "sourcesContent": [".card {\r\n  margin: 20px 0;\r\n  border: none;\r\n  transition: transform var(--transition-speed), box-shadow var(--transition-speed);\r\n}\r\n\r\n.card:hover {\r\n  transform: translateY(-5px);\r\n  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);\r\n}\r\n\r\n.card-img-top {\r\n  border-radius: var(--color-radius); /* Bordas arredondadas */\r\n  height: 200px; /* Altura fixa para as imagens */\r\n  object-fit: cover; /* Cobre a \u00E1rea da imagem */\r\n}\r\n\r\n.card-body {\r\n  background-color: var(--color-bg-secondary);\r\n  color: var(--color-text);\r\n  border-radius: var(--color-radius); /* Bordas arredondadas */\r\n  padding: 1.5rem; /* Padding interno */\r\n}\r\n\r\n.card-title {\r\n  font-size: var(--font-size-large);\r\n  font-weight: var(--font-weight-bold);\r\n  color: var(--color-heading);\r\n  margin-bottom: 0.5rem;\r\n}\r\n\r\n.card-text {\r\n  font-size: var(--font-size-normal);\r\n  color: var(--color-text);\r\n}"],
+  "mappings": ";AAAA,CAAC;AACC,UAAQ,KAAK;AACb,UAAQ;AACR,cAAY,UAAU,IAAI,mBAAmB,EAAE,WAAW,IAAI;AAChE;AAEA,CANC,IAMI;AACH,aAAW,WAAW;AACtB,cAAY,EAAE,IAAI,KAAK,KAAK,CAAC,EAAE,CAAC,EAAE,CAAC,EAAE;AACvC;AAEA,CAAC;AACC,iBAAe,IAAI;AACnB,UAAQ;AACR,cAAY;AACd;AAEA,CAAC;AACC,oBAAkB,IAAI;AACtB,SAAO,IAAI;AACX,iBAAe,IAAI;AACnB,WAAS;AACX;AAEA,CAAC;AACC,aAAW,IAAI;AACf,eAAa,IAAI;AACjB,SAAO,IAAI;AACX,iBAAe;AACjB;AAEA,CAAC;AACC,aAAW,IAAI;AACf,SAAO,IAAI;AACb;",
+  "names": []
+}
