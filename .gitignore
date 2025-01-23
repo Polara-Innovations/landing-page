@@ -44,4 +44,4 @@ Thumbs.db
 
 # environment files
 .env
-environment.default.ts
+src/environment.default.ts
