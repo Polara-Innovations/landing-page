@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
 import { ThemeService } from '../../services/theme-service/theme.service';
+import { Component, ElementRef, Renderer2, ViewChild } from '@angular/core';
 
 @Component({
   standalone: false,
@@ -11,14 +11,12 @@ export class HeaderComponent {
   activeNav: string = 'home';
   isNavbarOpen = false;
 
-  constructor(public themeService: ThemeService) {}
+  constructor(public themeService: ThemeService, private renderer: Renderer2) {}
+
+  @ViewChild('navbar', { static: false }) navbar: ElementRef | undefined;
 
   toggleTheme() {
     this.themeService.toggleTheme();
-  }
-
-  onNavClick(navItem: string): void {
-    this.activeNav = navItem;
   }
 
     toggleNavbar() {
@@ -28,4 +26,13 @@ export class HeaderComponent {
       navbarToggleBtn.setAttribute('aria-expanded', this.isNavbarOpen.toString());
     }
   }
+
+  scrollTo(elementId: string): void {
+    const element = document.getElementById(elementId);
+    this.activeNav = elementId;
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });;
+    }
+  }
+
 }

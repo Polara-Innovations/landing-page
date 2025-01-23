@@ -17,6 +17,9 @@ import { CardComponent } from './components/shared/card/card.component';
 import { HeroComponent } from './components/about/hero/hero.component';
 import { VisionMissionComponent } from './components/about/vision-mission/vision-mission.component';
 import { CoreValuesComponent } from './components/about/core-values/core-values.component';
+import { ProjectComponent } from './components/portfolio/project/project.component';
+import { CarouselComponent } from './components/portfolio/carousel/carousel.component';
+import { ReplacePipe } from './pipes/replace.pipe';
 
 @NgModule({
   declarations: [
@@ -27,11 +30,14 @@ import { CoreValuesComponent } from './components/about/core-values/core-values.
     AboutComponent,
     ServicesComponent,
     PortfolioComponent,
+    ProjectComponent,
+    CarouselComponent,
     ContactComponent,
     CardComponent,
     HeroComponent,
     VisionMissionComponent,
-    CoreValuesComponent
+    CoreValuesComponent,
+    ReplacePipe
   ],
   imports: [
     BrowserModule,
