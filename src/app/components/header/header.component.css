@@ -10,6 +10,8 @@
   box-sizing: border-box;
   background-color: var(--color-bg);
   z-index: 1000;
+  display: flex;
+  flex-direction: column;
 }
 
 .navbar-brand {
@@ -72,7 +74,8 @@
 }
 
 .navbar-toggler {
-  background: none; 
+  background: none;
+  align-self: center; 
   border: none; 
   color: var(--color-text); 
 }
@@ -97,7 +100,8 @@
     background: var(--color-bg);
     border: none;
     color: var(--color-text);
-    font-size: 30px;
+    margin-top: 1rem;
+    font-size: 6.5vw;
   }
 
   .navbar-collapse {

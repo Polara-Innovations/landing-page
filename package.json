@@ -7,7 +7,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "build": "ng build --configuration production --base-href /landing-page/",
-    "deploy": "ng build --configuration production --base-href /landing-page/ && npx gh-pages -d dist/landing-page/browser"
+    "deploy": "ng build --configuration production --base-href /landing-page/ && npx gh-pages -d docs/browser"
   },
   "private": true,
   "dependencies": {
