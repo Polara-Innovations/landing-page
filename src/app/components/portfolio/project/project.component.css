@@ -11,6 +11,10 @@
 }
 
 .card-body {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
   background-color: var(--color-bg-secondary);
   color: var(--color-text);
   border-top-left-radius: 0;

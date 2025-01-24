@@ -20,6 +20,7 @@ import { CoreValuesComponent } from './components/about/core-values/core-values.
 import { ProjectComponent } from './components/portfolio/project/project.component';
 import { CarouselComponent } from './components/portfolio/carousel/carousel.component';
 import { ReplacePipe } from './pipes/replace.pipe';
+import { WhoWeAreComponent } from './components/about/who-we-are/who-we-are.component';
 
 @NgModule({
   declarations: [
@@ -37,6 +38,7 @@ import { ReplacePipe } from './pipes/replace.pipe';
     HeroComponent,
     VisionMissionComponent,
     CoreValuesComponent,
+    WhoWeAreComponent,
     ReplacePipe
   ],
   imports: [

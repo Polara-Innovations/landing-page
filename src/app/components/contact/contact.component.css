@@ -1,9 +1,3 @@
-/* Seção de Contato */
-#contact {
-  background-color: var(--color-bg); /* Alinhamento com o tema */
-  padding: 4rem 0; /* Mais padding superior e inferior */
-}
-
 .contact-form {
   max-width: 600px;
   margin: 0 auto; /* Centraliza o formulário */

@@ -1,1 +1,19 @@
-@import "../../../assets/css/about-shared.styles.css";
+
+
+
+
+
+
+@media print {
+    body {
+      background-color: white; 
+      color: black; 
+    }
+  
+    .about-container {
+      max-width: 100%;
+      padding: 1rem;
+    }
+  }
+  
+  

@@ -114,10 +114,10 @@
   .navbar-collapse.show {
     display: flex;
   }
+}
 
   @media (min-width: 992px) {
     .navbar-collapse {
       display: block !important;
     }
   }
-}

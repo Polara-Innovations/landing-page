@@ -26,12 +26,17 @@ app-root {
   overflow-y: auto; /* Adiciona barra de rolagem vertical */
 }
 
+p{
+  margin: 0;
+  padding: 0;
+}
+
 .default-container {
   width: 100%; /* Garante que a largura ocupe 100% da tela */
   padding-left: 3rem; /* Padding esquerdo */
   padding-right: 3rem; /* Padding direito */
-  padding-top: 4rem; /* Padding superior */
-  padding-bottom: 4rem; /* Padding inferior */
+  padding-top: 1rem; /* Padding superior */
+  padding-bottom: 1rem; /* Padding inferior */
   box-sizing: border-box; /* Garante que o padding seja calculado dentro da largura total */
   background-color: var(--color-bg); /* Cor de fundo */
   color: var(--color-text); /* Cor do texto */

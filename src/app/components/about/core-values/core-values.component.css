@@ -1,1 +1,59 @@
-@import "../../../../assets/css/about-shared.styles.css";
+.core-values {
+    margin: 4rem 0;
+  }
+  
+  .values-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    margin-top: 2rem;
+  }
+  
+  .value-card {
+    padding: 2rem;
+    border-radius: 10px;
+    background: var(--color-bg-secondary);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .value-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  }
+  
+  .icon {
+    display: flex;
+    align-self: center;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1rem; 
+  }
+
+  /* Responsividade: Ajusta o layout para telas menores */
+@media (max-width: 1024px) {
+  .values-grid {
+    grid-template-columns: repeat(2, 1fr); /* 2 colunas para telas médias */
+  }
+}
+
+@media (max-width: 768px) {
+  .values-grid {
+    grid-template-columns: 1fr; /* 1 coluna para telas pequenas (celulares) */
+  }
+
+  .value-card {
+    padding: 1.5rem; /* Reduz o padding para se adaptar melhor */
+  }
+
+  .icon {
+    margin-bottom: 0.5rem; /* Ajusta o espaçamento da imagem para telas pequenas */
+  }
+}
+
+@media (max-width: 480px) {
+  .value-card {
+    padding: 1rem; /* Ajusta ainda mais o padding para telas muito pequenas */
+  }
+}
+  
