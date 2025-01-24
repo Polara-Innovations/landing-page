@@ -132,6 +132,18 @@
   .hero h1 {
     font-size: var(--font-size-xlarge);
   }
+
+  .hero-image {
+    width: 100% !important;
+    height: auto;
+    max-width: 75%; 
+  }
+
+  .hero-image img {
+    width: 100%;
+    max-width: 100%; 
+    height: auto;    
+  }
 }
 
 @media print {
