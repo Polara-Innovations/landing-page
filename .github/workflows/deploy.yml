@@ -3,7 +3,7 @@ name: Build and Deploy
 on:
   push:
     branches:
-      - master  
+      - master 
 
 permissions:
   contents: write  
@@ -31,11 +31,11 @@ jobs:
 
       - name: Build Angular Project 🛠️
         run: |
-          ng build --configuration production  # Usando a configuração de produção definida no angular.json
+          ng build --configuration production 
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4 
         with:
-          folder: dist/landing-page/browser  
+          folder: ./ 
           branch: gh-pages  
-          token: ${{ secrets.GITHUB_TOKEN }}  
+          token: ${{ secrets.GITHUB_TOKEN }}
