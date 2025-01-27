@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "polara-innovations-landing-page": {
+    "landing-page": {
       "projectType": "application",
       "schematics": {},
       "root": "",
